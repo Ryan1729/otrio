@@ -6,56 +6,87 @@ import Material
 type alias Model =
     { mdl : Material.Model
     , board : Board
+    , redRack : Rack
+    , greenRack : Rack
+    , blueRack : Rack
+    , yellowRack : Rack
     }
 
 
 defaultState =
     { mdl = Material.model
     , board = emptyBoard
+    , redRack = fullRack
+    , greenRack = fullRack
+    , blueRack = fullRack
+    , yellowRack = fullRack
     }
 
 
 emptyBoard : Board
 emptyBoard =
-    Board emptyBoardSection emptyBoardSection emptyBoardSection
+    Board emptySection
+        emptySection
+        emptySection
+        emptySection
+        emptySection
+        emptySection
+        emptySection
+        emptySection
+        emptySection
 
 
 type alias Board =
-    { large : BoardSection
-    , medium : BoardSection
-    , small : BoardSection
+    { topLeft : Section BoardState
+    , topMiddle : Section BoardState
+    , topRight : Section BoardState
+    , leftMiddle : Section BoardState
+    , middle : Section BoardState
+    , rightMiddle : Section BoardState
+    , bottomLeft : Section BoardState
+    , bottomMiddle : Section BoardState
+    , bottomRight : Section BoardState
     }
 
 
-emptyBoardSection : BoardSection
-emptyBoardSection =
-    BoardSection Empty
-        Empty
-        Empty
-        Empty
-        Empty
-        Empty
-        Empty
-        Empty
-        Empty
-
-
-type alias BoardSection =
-    { topLeft : SectionState
-    , topMiddle : SectionState
-    , topRight : SectionState
-    , leftMiddle : SectionState
-    , middle : SectionState
-    , rightMiddle : SectionState
-    , bottomLeft : SectionState
-    , bottomMiddle : SectionState
-    , bottomRight : SectionState
+type alias Section a =
+    { large : a
+    , medium : a
+    , small : a
     }
 
 
-type SectionState
+emptySection : Section BoardState
+emptySection =
+    Section Empty Empty Empty
+
+
+type BoardState
     = Red
-    | Blue
     | Green
+    | Blue
     | Yellow
     | Empty
+
+
+type alias Rack =
+    { first : Section Bool
+    , second : Section Bool
+    , third : Section Bool
+    }
+
+
+emptyRack =
+    Rack emptyRackSection emptyRackSection emptyRackSection
+
+
+emptyRackSection =
+    Section False False False
+
+
+fullRack =
+    Rack fullRackSection fullRackSection fullRackSection
+
+
+fullRackSection =
+    Section False False False
