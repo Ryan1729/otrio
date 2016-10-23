@@ -10,7 +10,7 @@ import Update exposing (update)
 
 init : ( Model, Cmd Msg )
 init =
-    defaultState ! []
+    ( defaultState, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

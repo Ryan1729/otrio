@@ -1,5 +1,11 @@
 module Model exposing (..)
 
-type alias Model = {}
+import Material
 
-defaultState = {}
+
+type alias Model =
+    { mdl : Material.Model }
+
+
+defaultState =
+    { mdl = Material.model }

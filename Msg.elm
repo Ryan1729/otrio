@@ -1,4 +1,8 @@
 module Msg exposing (..)
 
+import Material
+
+
 type Msg
-    = NoOp
+    = Mdl (Material.Msg Msg)
+    | NoOp
