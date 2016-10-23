@@ -89,4 +89,4 @@ fullRack =
 
 
 fullRackSection =
-    Section False False False
+    Section True True True
