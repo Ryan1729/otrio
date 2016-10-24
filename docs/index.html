@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>•○◎☉◉</title>
+    <style type="text/css">
+        html,
+        head,
+        body {
+            margin: 0;
+            height: 100%;
+            background-color: #DDDDDD;
+        }
+    </style>
+    <!-- MDL -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,500|Roboto+Mono|Roboto+Condensed:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.2.0/material.min.css" />
+
+</head>
+
+<body>
+  <audio id="clack" src="sounds/clack.wav" preload="auto" controls="none" style="display: none;"></audio>
+  <audio id="spare" preload="auto" controls="none" style="display: none;"></audio>
+  <audio id="spare2" preload="auto" controls="none" style="display: none;"></audio>
+  <div id="game"></div>
+  <script src="game.js"></script>
+  <script>
+      var game = Elm.Otrio.embed(document.getElementById('game'));
+
+
+      var sounds = {
+                clack: document.getElementById("clack"),
+                spare: document.getElementById("spare"),
+                spare: document.getElementById("spare2")
+            }
+
+      var soundHandler = function(name) {
+          var currentSound = sounds[name]
+          if (currentSound != null) {
+              if (currentSound.paused) {
+                  currentSound.play()
+              } else {
+                  var spare = sounds["spare"]
+                  if (spare != null && spare.paused) {
+                      spare.src = currentSound.src
+                      spare.play()
+                  }
+                  else {
+                    spare = sounds["spare2"]
+                    if (spare != null && spare.paused) {
+                        spare.src = currentSound.src
+                        spare.play()
+                    }
+                  }
+
+              }
+          }
+      }
+
+      game.ports.sound.subscribe(soundHandler);
+  </script>
+</body>
+</html>
