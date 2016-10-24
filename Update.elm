@@ -19,11 +19,12 @@ update msg model =
                         ( model, Cmd.none )
 
                     Just rackId ->
-                        let
-                            newModel =
-                                Model.placeAt Blue rackId boardId model
-                        in
-                            ( newModel, Ports.sound "clack" )
+                        case Model.placeAt Blue rackId boardId model of
+                            Nothing ->
+                                ( model, Cmd.none )
+
+                            Just newModel ->
+                                ( newModel, Ports.sound "clack" )
             else
                 ( model, Cmd.none )
 

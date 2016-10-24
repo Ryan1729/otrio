@@ -194,12 +194,17 @@ type Size
     | Small
 
 
-placeAt : PieceColour -> RackId -> BoardId -> Model -> Model
+placeAt : PieceColour -> RackId -> BoardId -> Model -> Maybe Model
 placeAt pieceColour rackId boardId model =
-    if getRackSectionValue pieceColour rackId model then
-        { model | board = setBoardSectionValue pieceColour boardId model.board }
+    if sizesMatch rackId boardId && getRackSectionValue pieceColour rackId model then
+        Just { model | board = setBoardSectionValue pieceColour boardId model.board }
     else
-        model
+        Nothing
+
+
+sizesMatch : RackId -> BoardId -> Bool
+sizesMatch (RackId _ rackSize) (BoardId _ boardSize) =
+    rackSize == boardSize
 
 
 setBoardSectionValue : PieceColour -> BoardId -> Board -> Board
