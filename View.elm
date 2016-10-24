@@ -30,12 +30,12 @@ yellow =
     "#EFEFAB"
 
 
-gameWidth : Int
+gameWidth : Float
 gameWidth =
     600
 
 
-gameHeight : Int
+gameHeight : Float
 gameHeight =
     600
 
@@ -48,14 +48,14 @@ heightString =
     toString gameHeight
 
 
-sectionWidth : Int
+sectionWidth : Float
 sectionWidth =
-    gameWidth // 5
+    gameWidth / 5
 
 
-sectionHeight : Int
+sectionHeight : Float
 sectionHeight =
-    gameHeight // 5
+    gameHeight / 5
 
 
 sectionWidthString : String
@@ -68,14 +68,14 @@ sectionHeightString =
     toString sectionHeight
 
 
-halfSectionWidth : Int
+halfSectionWidth : Float
 halfSectionWidth =
-    sectionWidth // 2
+    sectionWidth / 2
 
 
-halfSectionHeight : Int
+halfSectionHeight : Float
 halfSectionHeight =
-    sectionHeight // 2
+    sectionHeight / 2
 
 
 halfSectionWidthString : String
@@ -231,7 +231,7 @@ sectionView (RingsDescription largeDescription mediumDescription smallDescriptio
                     nullSvg
             , case smallDescription of
                 Colour colour ->
-                    circle [ cx halfSectionWidthString, cy halfSectionWidthString, r <| toString (halfSectionWidth * 1 // 9), stroke "grey", fill colour ] []
+                    circle [ cx halfSectionWidthString, cy halfSectionWidthString, r <| toString (halfSectionWidth * 1 / 9), stroke "grey", fill colour ] []
 
                 Blank ->
                     nullSvg
@@ -245,15 +245,15 @@ nullSvg =
 
 largeRing : String
 largeRing =
-    donut halfSectionWidth halfSectionHeight (halfSectionWidth - 1) (halfSectionWidth * 7 // 9)
+    donut (halfSectionWidth + 0.5) (halfSectionHeight + 0.5) (halfSectionWidth - 1.5) (halfSectionWidth * 7 / 9)
 
 
 mediumRing : String
 mediumRing =
-    donut halfSectionWidth halfSectionHeight ((halfSectionWidth * 5 // 9) - 1) (halfSectionWidth * 3 // 9)
+    donut (halfSectionWidth + 0.5) (halfSectionHeight + 0.5) ((halfSectionWidth * 5 / 9) - 1.5) (halfSectionWidth * 3 / 9)
 
 
-donut : Int -> Int -> Int -> Int -> String
+donut : Float -> Float -> Float -> Float -> String
 donut x y outerRadius innerRadius =
     -- http://stackoverflow.com/a/37883328/4496839
     let
