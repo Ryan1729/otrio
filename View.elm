@@ -1,6 +1,6 @@
 module View exposing (view)
 
-import Model exposing (Model, Board, BoardState(..), Section, Rack, RackId(..), Size(..))
+import Model exposing (Model, Board, BoardState(..), BoardId(..), BoardLocation(..), PieceColour(..), Section, Rack, RackId(..), Size(..))
 import Html exposing (Html, text, div)
 import Html.Attributes exposing (style)
 import Msg exposing (Msg(..))
@@ -121,7 +121,7 @@ view model =
                 ]
                 [ text "New Game" ]
             , rackDescription red model.redRack
-                |> List.map sectionView
+                |> List.indexedMap rackSectionView
                 |> div
                     [ Html.Attributes.style
                         [ ( "display", "flex" )
@@ -145,7 +145,7 @@ view model =
                 ]
             ]
             [ rackDescription green model.greenRack
-                |> List.map sectionView
+                |> List.indexedMap rackSectionView
                 |> div
                     [ Html.Attributes.style
                         [ ( "display", "flex" )
@@ -154,7 +154,7 @@ view model =
                     ]
             , boardView model.board
             , rackDescription yellow model.yellowRack
-                |> List.map sectionView
+                |> List.indexedMap rackSectionView
                 |> div
                     [ Html.Attributes.style
                         [ ( "display", "flex" )
@@ -181,29 +181,54 @@ boardView board =
             , ( "flex-direction", "column" )
             ]
         ]
-        [ boardRowView board.topLeft board.topMiddle board.topRight
-        , boardRowView board.leftMiddle board.middle board.rightMiddle
-        , boardRowView board.bottomLeft board.bottomMiddle board.bottomRight
-        ]
-
-
-boardRowView : Section BoardState -> Section BoardState -> Section BoardState -> Html Msg
-boardRowView left middle right =
-    div
-        [ Html.Attributes.style
-            [ ( "display", "flex" )
-            , ( "flex-direction", "row" )
+        [ div
+            [ Html.Attributes.style
+                [ ( "display", "flex" )
+                , ( "flex-direction", "row" )
+                ]
             ]
-        ]
-        [ left
-            |> boardSectionDescription
-            |> sectionView
-        , middle
-            |> boardSectionDescription
-            |> sectionView
-        , right
-            |> boardSectionDescription
-            |> sectionView
+            [ board.topLeft
+                |> boardSectionDescription
+                |> boardSectionView TopLeft
+            , board.topMiddle
+                |> boardSectionDescription
+                |> boardSectionView TopMiddle
+            , board.topRight
+                |> boardSectionDescription
+                |> boardSectionView TopRight
+            ]
+        , div
+            [ Html.Attributes.style
+                [ ( "display", "flex" )
+                , ( "flex-direction", "row" )
+                ]
+            ]
+            [ board.leftMiddle
+                |> boardSectionDescription
+                |> boardSectionView LeftMiddle
+            , board.middle
+                |> boardSectionDescription
+                |> boardSectionView Middle
+            , board.rightMiddle
+                |> boardSectionDescription
+                |> boardSectionView RightMiddle
+            ]
+        , div
+            [ Html.Attributes.style
+                [ ( "display", "flex" )
+                , ( "flex-direction", "row" )
+                ]
+            ]
+            [ board.bottomLeft
+                |> boardSectionDescription
+                |> boardSectionView BottomLeft
+            , board.bottomMiddle
+                |> boardSectionDescription
+                |> boardSectionView BottomMiddle
+            , board.bottomRight
+                |> boardSectionDescription
+                |> boardSectionView BottomRight
+            ]
         ]
 
 
@@ -229,21 +254,35 @@ boardSectionDescription section =
         (descriptionFromBoardState section.small)
 
 
-sectionView : RingsDescription -> Html Msg
-sectionView (RingsDescription largeDescription mediumDescription smallDescription) =
+boardSectionView : BoardLocation -> RingsDescription -> Html Msg
+boardSectionView location (RingsDescription largeDescription mediumDescription smallDescription) =
     svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ]
         [ case largeDescription of
             Colour colour ->
                 piecePath [ stroke "grey", fill colour, d largeRing ]
 
             Blank ->
-                piecePath [ onClick Place, fillOpacity "0.1", d largeRing, stroke "grey" ]
+                piecePath
+                    [ BoardId location Large
+                        |> Place
+                        |> onClick
+                    , fillOpacity "0.1"
+                    , d largeRing
+                    , stroke "grey"
+                    ]
         , case mediumDescription of
             Colour colour ->
                 piecePath [ stroke "grey", fill colour, d mediumRing ]
 
             Blank ->
-                piecePath [ onClick Place, fillOpacity "0.1", d mediumRing, stroke "grey" ]
+                piecePath
+                    [ BoardId location Medium
+                        |> Place
+                        |> onClick
+                    , fillOpacity "0.1"
+                    , d mediumRing
+                    , stroke "grey"
+                    ]
         , case smallDescription of
             Colour colour ->
                 circle
@@ -261,36 +300,42 @@ sectionView (RingsDescription largeDescription mediumDescription smallDescriptio
                     , cy halfSectionWidthString
                     , r <| toString (halfSectionWidth * 1 / 9)
                     , stroke "grey"
-                    , onClick Place
+                    , BoardId location Small
+                        |> Place
+                        |> onClick
                     , fillOpacity "0.1"
                     ]
                     []
         ]
 
 
+rackSectionView =
+    playerRackSectionViewHelper noHighlight noHighlight noHighlight
+
+
 playerRackSectionView : Maybe RackId -> Int -> RingsDescription -> Html Msg
-playerRackSectionView maybeRackId index (RingsDescription largeDescription mediumDescription smallDescription) =
+playerRackSectionView maybeRackId index ringDescription =
     let
         curriedHelper =
-            playerRackSectionViewHelper index largeDescription mediumDescription smallDescription
+            case maybeRackId of
+                Nothing ->
+                    playerRackSectionViewHelper noHighlight noHighlight noHighlight
+
+                Just (RackId rackIndex size) ->
+                    if index == rackIndex then
+                        case size of
+                            Large ->
+                                playerRackSectionViewHelper highlight noHighlight noHighlight
+
+                            Medium ->
+                                playerRackSectionViewHelper noHighlight highlight noHighlight
+
+                            Small ->
+                                playerRackSectionViewHelper noHighlight noHighlight highlight
+                    else
+                        playerRackSectionViewHelper noHighlight noHighlight noHighlight
     in
-        case maybeRackId of
-            Nothing ->
-                curriedHelper noHighlight noHighlight noHighlight
-
-            Just (RackId rackIndex size) ->
-                if index == rackIndex then
-                    case size of
-                        Large ->
-                            curriedHelper highlight noHighlight noHighlight
-
-                        Medium ->
-                            curriedHelper noHighlight highlight noHighlight
-
-                        Small ->
-                            curriedHelper noHighlight noHighlight highlight
-                else
-                    curriedHelper noHighlight noHighlight noHighlight
+        curriedHelper index ringDescription
 
 
 noHighlight =
@@ -301,7 +346,7 @@ highlight =
     [ stroke "white" ]
 
 
-playerRackSectionViewHelper index largeDescription mediumDescription smallDescription largeAttributes mediumAttributes smallAttributes =
+playerRackSectionViewHelper largeAttributes mediumAttributes smallAttributes index (RingsDescription largeDescription mediumDescription smallDescription) =
     svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ]
         [ case largeDescription of
             Colour colour ->
@@ -406,16 +451,16 @@ descriptionFromRack colour b =
 descriptionFromBoardState : BoardState -> RingDescription
 descriptionFromBoardState boardState =
     case boardState of
-        Red ->
+        PieceType Red ->
             Colour red
 
-        Green ->
+        PieceType Green ->
             Colour green
 
-        Blue ->
+        PieceType Blue ->
             Colour blue
 
-        Yellow ->
+        PieceType Yellow ->
             Colour yellow
 
         Empty ->
