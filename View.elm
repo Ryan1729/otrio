@@ -4,6 +4,7 @@ import Model exposing (Model, Board, BoardState(..), Section, Rack, RackId(..), 
 import Html exposing (Html, text, div)
 import Html.Attributes exposing (style)
 import Msg exposing (Msg(..))
+import Material.Options as Options exposing (css)
 import Material.Button as Button
 import Svg exposing (Svg, svg, circle, polygon, Attribute)
 import Svg.Attributes exposing (..)
@@ -104,22 +105,39 @@ view model =
             , ( "align-items", "center" )
             ]
         ]
-        [ Button.render Mdl
-            [ 0 ]
-            model.mdl
-            [ Button.raised
-            , Button.ripple
-            , Button.onClick NoOp
-            ]
-            [ text "New Game" ]
-        , rackDescription red model.redRack
-            |> List.map sectionView
-            |> div
-                [ Html.Attributes.style
-                    [ ( "display", "flex" )
-                    , ( "flex-direction", "row" )
-                    ]
+        [ div
+            [ Html.Attributes.style
+                [ ( "display", "flex" )
+                , ( "flex-direction", "row" )
                 ]
+            ]
+            [ Button.render Mdl
+                [ 0 ]
+                model.mdl
+                [ Button.raised
+                , Button.ripple
+                , Button.onClick NoOp
+                , css "width" (sectionWidthString ++ "px")
+                ]
+                [ text "New Game" ]
+            , rackDescription red model.redRack
+                |> List.map sectionView
+                |> div
+                    [ Html.Attributes.style
+                        [ ( "display", "flex" )
+                        , ( "flex-direction", "row" )
+                        ]
+                    ]
+            , Button.render Mdl
+                [ 1 ]
+                model.mdl
+                [ Button.raised
+                , Button.ripple
+                , Button.onClick NoOp
+                , css "width" (sectionWidthString ++ "px")
+                ]
+                [ text "Mute" ]
+            ]
         , div
             [ Html.Attributes.style
                 [ ( "display", "flex" )
