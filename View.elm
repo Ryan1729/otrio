@@ -95,18 +95,6 @@ viewBoxString =
         ++ sectionHeightString
 
 
-
--- viewBoxString =
---     "-"
---         ++ halfSectionWidthString
---         ++ " -"
---         ++ halfSectionHeightString
---         ++ " "
---         ++ sectionWidthString
---         ++ " "
---         ++ sectionHeightString
-
-
 view : Model -> Html Msg
 view model =
     div
@@ -140,11 +128,21 @@ view model =
             ]
             [ rackDescription green model.greenRack
                 |> List.map sectionView
-                |> div []
+                |> div
+                    [ Html.Attributes.style
+                        [ ( "display", "flex" )
+                        , ( "flex-direction", "column" )
+                        ]
+                    ]
             , boardView model.board
             , rackDescription yellow model.yellowRack
                 |> List.map sectionView
-                |> div []
+                |> div
+                    [ Html.Attributes.style
+                        [ ( "display", "flex" )
+                        , ( "flex-direction", "column" )
+                        ]
+                    ]
             ]
         , rackDescription blue model.blueRack
             |> List.map sectionView
@@ -215,27 +213,25 @@ boardSectionDescription section =
 
 sectionView : RingsDescription -> Html Msg
 sectionView (RingsDescription largeDescription mediumDescription smallDescription) =
-    div []
-        [ svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ]
-            [ case largeDescription of
-                Colour colour ->
-                    Svg.path [ stroke "grey", fill colour, d largeRing ] []
+    svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ]
+        [ case largeDescription of
+            Colour colour ->
+                Svg.path [ stroke "grey", fill colour, d largeRing ] []
 
-                Blank ->
-                    nullSvg
-            , case mediumDescription of
-                Colour colour ->
-                    Svg.path [ stroke "grey", fill colour, d mediumRing ] []
+            Blank ->
+                nullSvg
+        , case mediumDescription of
+            Colour colour ->
+                Svg.path [ stroke "grey", fill colour, d mediumRing ] []
 
-                Blank ->
-                    nullSvg
-            , case smallDescription of
-                Colour colour ->
-                    circle [ cx halfSectionWidthString, cy halfSectionWidthString, r <| toString (halfSectionWidth * 1 / 9), stroke "grey", fill colour ] []
+            Blank ->
+                nullSvg
+        , case smallDescription of
+            Colour colour ->
+                circle [ cx halfSectionWidthString, cy halfSectionWidthString, r <| toString (halfSectionWidth * 1 / 9), stroke "grey", fill colour ] []
 
-                Blank ->
-                    nullSvg
-            ]
+            Blank ->
+                nullSvg
         ]
 
 
