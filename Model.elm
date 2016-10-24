@@ -25,15 +25,29 @@ defaultState =
 
 emptyBoard : Board
 emptyBoard =
-    Board emptySection
-        emptySection
-        emptySection
-        emptySection
-        emptySection
-        emptySection
-        emptySection
-        emptySection
-        emptySection
+    Board (Section Red Green Blue)
+        (Section Red Green Blue)
+        (Section Red Green Blue)
+        (Section Green Blue Red)
+        (Section Green Blue Red)
+        (Section Green Blue Red)
+        (Section Blue Red Green)
+        (Section Blue Red Green)
+        (Section Blue Red Green)
+
+
+
+-- emptyBoard : Board
+-- emptyBoard =
+--     Board emptySection
+--         emptySection
+--         emptySection
+--         emptySection
+--         emptySection
+--         emptySection
+--         emptySection
+--         emptySection
+--         emptySection
 
 
 type alias Board =

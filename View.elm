@@ -1,6 +1,6 @@
 module View exposing (view)
 
-import Model exposing (Model, BoardState(..), Section, Rack)
+import Model exposing (Model, Board, BoardState(..), Section, Rack)
 import Html exposing (Html, text, div)
 import Html.Attributes exposing (style)
 import Msg exposing (Msg(..))
@@ -125,7 +125,7 @@ view model =
             ]
             [ text "New Game" ]
         , rackDescription red model.redRack
-            |> List.map (sectionView model)
+            |> List.map sectionView
             |> div
                 [ Html.Attributes.style
                     [ ( "display", "flex" )
@@ -139,23 +139,55 @@ view model =
                 ]
             ]
             [ rackDescription green model.greenRack
-                |> List.map (sectionView model)
+                |> List.map sectionView
                 |> div []
-            , model.board
-                |> toString
-                |> text
+            , boardView model.board
             , rackDescription yellow model.yellowRack
-                |> List.map (sectionView model)
+                |> List.map sectionView
                 |> div []
             ]
         , rackDescription blue model.blueRack
-            |> List.map (sectionView model)
+            |> List.map sectionView
             |> div
                 [ Html.Attributes.style
                     [ ( "display", "flex" )
                     , ( "flex-direction", "row" )
                     ]
                 ]
+        ]
+
+
+boardView : Board -> Html Msg
+boardView board =
+    div
+        [ Html.Attributes.style
+            [ ( "display", "flex" )
+            , ( "flex-direction", "column" )
+            ]
+        ]
+        [ boardRowView board.topLeft board.topMiddle board.topRight
+        , boardRowView board.leftMiddle board.middle board.rightMiddle
+        , boardRowView board.bottomLeft board.bottomMiddle board.bottomRight
+        ]
+
+
+boardRowView : Section BoardState -> Section BoardState -> Section BoardState -> Html Msg
+boardRowView left middle right =
+    div
+        [ Html.Attributes.style
+            [ ( "display", "flex" )
+            , ( "flex-direction", "row" )
+            ]
+        ]
+        [ left
+            |> boardSectionDescription
+            |> sectionView
+        , middle
+            |> boardSectionDescription
+            |> sectionView
+        , right
+            |> boardSectionDescription
+            |> sectionView
         ]
 
 
@@ -181,8 +213,8 @@ boardSectionDescription section =
         (descriptionFromBoardState section.small)
 
 
-sectionView : Model -> RingsDescription -> Html Msg
-sectionView model (RingsDescription largeDescription mediumDescription smallDescription) =
+sectionView : RingsDescription -> Html Msg
+sectionView (RingsDescription largeDescription mediumDescription smallDescription) =
     div []
         [ svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ]
             [ case largeDescription of
