@@ -13,3 +13,6 @@ update msg model =
 
         Mdl msg' ->
             Material.update msg' model
+
+        Select rackId ->
+            ( { model | selected = Just rackId }, Cmd.none )

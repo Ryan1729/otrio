@@ -1,6 +1,6 @@
 module View exposing (view)
 
-import Model exposing (Model, Board, BoardState(..), Section, Rack)
+import Model exposing (Model, Board, BoardState(..), Section, Rack, RackId(..), Size(..))
 import Html exposing (Html, text, div)
 import Html.Attributes exposing (style)
 import Msg exposing (Msg(..))
@@ -145,7 +145,7 @@ view model =
                     ]
             ]
         , rackDescription blue model.blueRack
-            |> List.map sectionView
+            |> List.indexedMap (playerRackSectionView model.selected)
             |> div
                 [ Html.Attributes.style
                     [ ( "display", "flex" )
@@ -233,6 +233,78 @@ sectionView (RingsDescription largeDescription mediumDescription smallDescriptio
             Blank ->
                 nullSvg
         ]
+
+
+playerRackSectionView : Maybe RackId -> Int -> RingsDescription -> Html Msg
+playerRackSectionView maybeRackId index (RingsDescription largeDescription mediumDescription smallDescription) =
+    let
+        curriedHelper =
+            playerRackSectionViewHelper index largeDescription mediumDescription smallDescription
+    in
+        case maybeRackId of
+            Nothing ->
+                curriedHelper noHighlight noHighlight noHighlight
+
+            Just (RackId rackIndex size) ->
+                if index == rackIndex then
+                    case size of
+                        Large ->
+                            curriedHelper highlight noHighlight noHighlight
+
+                        Medium ->
+                            curriedHelper noHighlight highlight noHighlight
+
+                        Small ->
+                            curriedHelper noHighlight noHighlight highlight
+                else
+                    curriedHelper noHighlight noHighlight noHighlight
+
+
+noHighlight =
+    [ stroke "grey" ]
+
+
+highlight =
+    [ stroke "white" ]
+
+
+playerRackSectionViewHelper index largeDescription mediumDescription smallDescription largeAttributes mediumAttributes smallAttributes =
+    svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ]
+        [ case largeDescription of
+            Colour colour ->
+                [ RackId index Large |> Select |> onClick, fill colour, d largeRing ]
+                    ++ largeAttributes
+                    |> piecePath
+
+            Blank ->
+                nullSvg
+        , case mediumDescription of
+            Colour colour ->
+                [ RackId index Medium |> Select |> onClick, fill colour, d mediumRing ]
+                    ++ mediumAttributes
+                    |> piecePath
+
+            Blank ->
+                nullSvg
+        , case smallDescription of
+            Colour colour ->
+                [ RackId index Small |> Select |> onClick, cx halfSectionWidthString, cy halfSectionWidthString, r <| toString (halfSectionWidth * 1 / 9), stroke "grey", fill colour ]
+                    ++ smallAttributes
+                    |> pieceCircle
+
+            Blank ->
+                nullSvg
+        ]
+
+
+piecePath : List (Svg.Attribute Msg) -> Svg Msg
+piecePath attributes =
+    Svg.path attributes []
+
+
+pieceCircle : List (Svg.Attribute Msg) -> Svg Msg
+pieceCircle attributes =
+    circle attributes []
 
 
 nullSvg =

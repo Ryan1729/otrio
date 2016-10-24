@@ -10,6 +10,7 @@ type alias Model =
     , greenRack : Rack
     , blueRack : Rack
     , yellowRack : Rack
+    , selected : Maybe RackId
     }
 
 
@@ -20,6 +21,7 @@ defaultState =
     , greenRack = fullRack
     , blueRack = fullRack
     , yellowRack = fullRack
+    , selected = Nothing
     }
 
 
@@ -90,3 +92,13 @@ fullRack =
 
 fullRackSection =
     Section True True True
+
+
+type RackId
+    = RackId Int Size
+
+
+type Size
+    = Large
+    | Medium
+    | Small
