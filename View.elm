@@ -5,7 +5,7 @@ import Html exposing (Html, text, div)
 import Html.Attributes exposing (style)
 import Msg exposing (Msg(..))
 import Material.Button as Button
-import Svg exposing (Svg, svg, circle, Attribute)
+import Svg exposing (Svg, svg, circle, polygon, Attribute)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (onClick)
 
@@ -89,14 +89,22 @@ halfSectionHeightString =
 
 
 viewBoxString =
-    "-"
-        ++ halfSectionWidthString
-        ++ " -"
-        ++ halfSectionHeightString
-        ++ " "
+    "0 0 "
         ++ sectionWidthString
         ++ " "
         ++ sectionHeightString
+
+
+
+-- viewBoxString =
+--     "-"
+--         ++ halfSectionWidthString
+--         ++ " -"
+--         ++ halfSectionHeightString
+--         ++ " "
+--         ++ sectionWidthString
+--         ++ " "
+--         ++ sectionHeightString
 
 
 view : Model -> Html Msg
@@ -116,12 +124,38 @@ view model =
             , Button.onClick NoOp
             ]
             [ text "New Game" ]
-        , model.board
-            |> toString
-            |> text
+        , rackDescription red model.redRack
+            |> List.map (sectionView model)
+            |> div
+                [ Html.Attributes.style
+                    [ ( "display", "flex" )
+                    , ( "flex-direction", "row" )
+                    ]
+                ]
+        , div
+            [ Html.Attributes.style
+                [ ( "display", "flex" )
+                , ( "flex-direction", "row" )
+                ]
+            ]
+            [ rackDescription green model.greenRack
+                |> List.map (sectionView model)
+                |> div []
+            , model.board
+                |> toString
+                |> text
+            , rackDescription yellow model.yellowRack
+                |> List.map (sectionView model)
+                |> div []
+            ]
         , rackDescription blue model.blueRack
             |> List.map (sectionView model)
-            |> div []
+            |> div
+                [ Html.Attributes.style
+                    [ ( "display", "flex" )
+                    , ( "flex-direction", "row" )
+                    ]
+                ]
         ]
 
 
@@ -150,11 +184,73 @@ boardSectionDescription section =
 sectionView : Model -> RingsDescription -> Html Msg
 sectionView model (RingsDescription largeDescription mediumDescription smallDescription) =
     div []
-        [ svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ] [ circle [ r "30", fill "#7F9Fff" ] [] ]
-        , ( mediumDescription, smallDescription )
-            |> toString
-            |> text
+        [ svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ]
+            [ case largeDescription of
+                Colour colour ->
+                    Svg.path [ stroke "grey", fill colour, d largeRing ] []
+
+                Blank ->
+                    nullSvg
+            , case mediumDescription of
+                Colour colour ->
+                    Svg.path [ stroke "grey", fill colour, d mediumRing ] []
+
+                Blank ->
+                    nullSvg
+            , case smallDescription of
+                Colour colour ->
+                    circle [ cx halfSectionWidthString, cy halfSectionWidthString, r <| toString (halfSectionWidth * 1 // 9), stroke "grey", fill colour ] []
+
+                Blank ->
+                    nullSvg
+            ]
         ]
+
+
+nullSvg =
+    polygon [] []
+
+
+largeRing : String
+largeRing =
+    donut halfSectionWidth halfSectionHeight (halfSectionWidth - 1) (halfSectionWidth * 7 // 9)
+
+
+mediumRing : String
+mediumRing =
+    donut halfSectionWidth halfSectionHeight ((halfSectionWidth * 5 // 9) - 1) (halfSectionWidth * 3 // 9)
+
+
+donut : Int -> Int -> Int -> Int -> String
+donut x y outerRadius innerRadius =
+    -- http://stackoverflow.com/a/37883328/4496839
+    let
+        outerRadiusString =
+            toString outerRadius
+
+        innerRadiusString =
+            toString innerRadius
+    in
+        -- Move to center of ring
+        ("M " ++ toString x ++ " " ++ toString y)
+            -- Move to top of ring
+            ++
+                (" m 0 " ++ toString -outerRadius)
+            -- Draw outer arc, but don't close it
+            ++
+                (" a " ++ outerRadiusString ++ " " ++ outerRadiusString ++ " 0 1 0 1 0")
+            -- default fill-rule:even-odd will help create the empty innards
+            ++
+                " Z"
+            -- Move to top point of inner radius
+            ++
+                (" m 0 " ++ toString (outerRadius - innerRadius))
+            -- Draw inner arc, but don't close it
+            ++
+                (" a " ++ innerRadiusString ++ " " ++ innerRadiusString ++ " 0 1 1 -1 0")
+            --Close the inner ring. Actually will still work without, but inner ring will have one unit missing in stroke
+            ++
+                " Z"
 
 
 type RingDescription
