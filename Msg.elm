@@ -7,4 +7,5 @@ import Model exposing (RackId)
 type Msg
     = Mdl (Material.Msg Msg)
     | Select RackId
+    | Place
     | NoOp

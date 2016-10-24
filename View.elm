@@ -234,22 +234,37 @@ sectionView (RingsDescription largeDescription mediumDescription smallDescriptio
     svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ]
         [ case largeDescription of
             Colour colour ->
-                Svg.path [ stroke "grey", fill colour, d largeRing ] []
+                piecePath [ stroke "grey", fill colour, d largeRing ]
 
             Blank ->
-                nullSvg
+                piecePath [ onClick Place, fillOpacity "0.1", d largeRing, stroke "grey" ]
         , case mediumDescription of
             Colour colour ->
-                Svg.path [ stroke "grey", fill colour, d mediumRing ] []
+                piecePath [ stroke "grey", fill colour, d mediumRing ]
 
             Blank ->
-                nullSvg
+                piecePath [ onClick Place, fillOpacity "0.1", d mediumRing, stroke "grey" ]
         , case smallDescription of
             Colour colour ->
-                circle [ cx halfSectionWidthString, cy halfSectionWidthString, r <| toString (halfSectionWidth * 1 / 9), stroke "grey", fill colour ] []
+                circle
+                    [ cx halfSectionWidthString
+                    , cy halfSectionWidthString
+                    , r <| toString (halfSectionWidth * 1 / 9)
+                    , stroke "grey"
+                    , fill colour
+                    ]
+                    []
 
             Blank ->
-                nullSvg
+                circle
+                    [ cx halfSectionWidthString
+                    , cy halfSectionWidthString
+                    , r <| toString (halfSectionWidth * 1 / 9)
+                    , stroke "grey"
+                    , onClick Place
+                    , fillOpacity "0.1"
+                    ]
+                    []
         ]
 
 
@@ -326,7 +341,7 @@ pieceCircle attributes =
 
 
 nullSvg =
-    polygon [] []
+    piecePath []
 
 
 largeRing : String

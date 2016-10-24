@@ -21,10 +21,45 @@
 </head>
 
 <body>
+  <audio id="clack" src="sounds/clack.wav" preload="auto" controls="none" style="display: none;"></audio>
+  <audio id="spare" preload="auto" controls="none" style="display: none;"></audio>
+  <audio id="spare2" preload="auto" controls="none" style="display: none;"></audio>
   <div id="game"></div>
   <script src="game.js"></script>
   <script>
       var game = Elm.Otrio.embed(document.getElementById('game'));
+
+
+      var sounds = {
+                clack: document.getElementById("clack"),
+                spare: document.getElementById("spare"),
+                spare: document.getElementById("spare2")
+            }
+
+      var soundHandler = function(name) {
+          var currentSound = sounds[name]
+          if (currentSound != null) {
+              if (currentSound.paused) {
+                  currentSound.play()
+              } else {
+                  var spare = sounds["spare"]
+                  if (spare != null && spare.paused) {
+                      spare.src = currentSound.src
+                      spare.play()
+                  }
+                  else {
+                    spare = sounds["spare2"]
+                    if (spare != null && spare.paused) {
+                        spare.src = currentSound.src
+                        spare.play()
+                    }
+                  }
+
+              }
+          }
+      }
+
+      game.ports.sound.subscribe(soundHandler);
   </script>
 </body>
 </html>
