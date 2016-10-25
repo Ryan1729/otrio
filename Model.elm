@@ -12,6 +12,7 @@ type alias Model =
     , blueRack : Rack
     , yellowRack : Rack
     , selected : Maybe RackId
+    , players : Int
     }
 
 
@@ -23,6 +24,7 @@ defaultState =
     , blueRack = fullRack
     , yellowRack = fullRack
     , selected = Nothing
+    , players = 2
     }
 
 
@@ -263,10 +265,26 @@ type RackId
     = RackId Int Size
 
 
+rackIndexPossibilities =
+    [0..2]
+
+
+rackIdPossibilities =
+    rackIndexPossibilities
+        |> List.concatMap
+            (\index ->
+                List.map (RackId index) sizePossibilities
+            )
+
+
 type Size
     = Large
     | Medium
     | Small
+
+
+sizePossibilities =
+    [ Large, Medium, Small ]
 
 
 placeAt : PieceColour -> RackId -> BoardId -> Model -> Maybe Model
@@ -423,3 +441,21 @@ completeSection boardState section =
     (section.large == boardState)
         && (section.medium == boardState)
         && (section.small == boardState)
+
+
+getAllEmptySpacesOfSize : Board -> Size -> List (BoardId)
+getAllEmptySpacesOfSize board size =
+    List.filterMap
+        (\location ->
+            let
+                boardId =
+                    BoardId location size
+            in
+                case isFree board boardId of
+                    True ->
+                        Just boardId
+
+                    False ->
+                        Nothing
+        )
+        boardLocationPossibilities
