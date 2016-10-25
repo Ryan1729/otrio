@@ -1,6 +1,7 @@
 module Model exposing (..)
 
 import Material
+import Extras
 
 
 type alias Model =
@@ -65,6 +66,60 @@ type BoardLocation
     | BottomLeft
     | BottomMiddle
     | BottomRight
+
+
+boardLocationPossibilities : List BoardLocation
+boardLocationPossibilities =
+    [ TopLeft
+    , TopMiddle
+    , TopRight
+    , LeftMiddle
+    , Middle
+    , RightMiddle
+    , BottomLeft
+    , BottomMiddle
+    , BottomRight
+    ]
+
+
+lineLocations : List (List BoardLocation)
+lineLocations =
+    [ --rows
+      [ TopLeft
+      , TopMiddle
+      , TopRight
+      ]
+    , [ LeftMiddle
+      , Middle
+      , RightMiddle
+      ]
+    , [ BottomLeft
+      , BottomMiddle
+      , BottomRight
+      ]
+      --columns
+    , [ TopLeft
+      , LeftMiddle
+      , BottomLeft
+      ]
+    , [ TopMiddle
+      , Middle
+      , BottomMiddle
+      ]
+    , [ TopRight
+      , RightMiddle
+      , BottomRight
+      ]
+      --diagonals
+    , [ TopLeft
+      , Middle
+      , BottomRight
+      ]
+    , [ TopRight
+      , Middle
+      , BottomLeft
+      ]
+    ]
 
 
 getBoardSection : Board -> BoardLocation -> Section BoardState
@@ -146,6 +201,14 @@ type PieceColour
     | Green
     | Blue
     | Yellow
+
+
+pieceColourPossibilities =
+    [ Red
+    , Green
+    , Blue
+    , Yellow
+    ]
 
 
 type alias Rack =
@@ -300,3 +363,63 @@ isFree board (BoardId location size) =
         |> getSectionValue size
     )
         == Empty
+
+
+getWinner : Board -> Maybe PieceColour
+getWinner board =
+    Extras.find (hasMatchOfGivenColour board) pieceColourPossibilities
+
+
+hasMatchOfGivenColour : Board -> PieceColour -> Bool
+hasMatchOfGivenColour board pieceColour =
+    let
+        boardState =
+            PieceType pieceColour
+    in
+        List.any (completeSection boardState) (getBoardSections board)
+            || let
+                lines =
+                    getLines board
+               in
+                List.any (matchingLine boardState) lines
+                    || List.any (oneOfEachLine boardState) lines
+
+
+getBoardSections : Board -> List (Section BoardState)
+getBoardSections board =
+    List.map (getBoardSection board) boardLocationPossibilities
+
+
+getLines : Board -> List (List (Section BoardState))
+getLines board =
+    List.map (List.map (getBoardSection board)) lineLocations
+
+
+matchingLine : BoardState -> List (Section BoardState) -> Bool
+matchingLine boardState line =
+    List.all (.large >> (==) boardState) line
+        || List.all (.medium >> (==) boardState) line
+        || List.all (.small >> (==) boardState) line
+
+
+oneOfEachLine : BoardState -> List (Section BoardState) -> Bool
+oneOfEachLine boardState line =
+    case line of
+        first :: second :: third :: _ ->
+            --TODO remove duplicate record acceses
+            (first.small == boardState && second.medium == boardState && third.large == boardState)
+                || (first.small == boardState && second.large == boardState && third.medium == boardState)
+                || (first.medium == boardState && second.small == boardState && third.large == boardState)
+                || (first.medium == boardState && second.large == boardState && third.small == boardState)
+                || (first.large == boardState && second.small == boardState && third.medium == boardState)
+                || (first.large == boardState && second.medium == boardState && third.small == boardState)
+
+        _ ->
+            False
+
+
+completeSection : BoardState -> Section BoardState -> Bool
+completeSection boardState section =
+    (section.large == boardState)
+        && (section.medium == boardState)
+        && (section.small == boardState)
