@@ -84,6 +84,10 @@ boardLocationPossibilities =
     ]
 
 
+boardIdPossibilities =
+    List.concatMap (\location -> List.map (BoardId location) sizePossibilities) boardLocationPossibilities
+
+
 lineLocations : List (List BoardLocation)
 lineLocations =
     [ --rows
@@ -459,3 +463,20 @@ getAllEmptySpacesOfSize board size =
                         Nothing
         )
         boardLocationPossibilities
+
+
+getBlockingBoardIdsForColour : Board -> PieceColour -> List BoardId
+getBlockingBoardIdsForColour board pieceColour =
+    List.filter
+        (\boardId ->
+            case
+                setBoardSectionValue pieceColour boardId board
+                    |> getWinner
+            of
+                Just _ ->
+                    True
+
+                Nothing ->
+                    False
+        )
+        boardIdPossibilities

@@ -51,11 +51,11 @@ cpuMoves model =
                 _ ->
                     [ Green, Red, Yellow ]
     in
-        List.foldl takeMove model rackList
+        List.foldl takeTurn model rackList
 
 
-takeMove : PieceColour -> Model -> Model
-takeMove pieceColour model =
+takeTurn : PieceColour -> Model -> Model
+takeTurn pieceColour model =
     let
         maybeWinner =
             Model.getWinner model.board
@@ -80,13 +80,23 @@ findMove pieceColour model =
                 |> shuffle (Random.initialSeed 42)
 
         maybeWinningMove =
-            moves
-                |> Extras.find (winningMove pieceColour model)
+            Extras.find (winningMove pieceColour model) moves
     in
         case maybeWinningMove of
             Nothing ->
-                Random.step (Random.sample moves) (Random.initialSeed 42)
-                    |> fst
+                case
+                    let
+                        blockingBoardIds =
+                            getBlockingBoardIds (otherColours pieceColour) model.board
+                    in
+                        Extras.find (\( _, boardId ) -> List.member boardId blockingBoardIds) moves
+                of
+                    Nothing ->
+                        Random.step (Random.sample moves) (Random.initialSeed 42)
+                            |> fst
+
+                    move ->
+                        move
 
             move ->
                 move
@@ -102,12 +112,17 @@ winningMove pieceColour model ( rackId, boardId ) =
             False
 
         Just a ->
-            let
-                _ =
-                    Debug.log "a" a
-            in
-                True
-                    |> Debug.log ""
+            True
+
+
+getBlockingBoardIds : List PieceColour -> Board -> List BoardId
+getBlockingBoardIds pieceColours board =
+    List.concatMap (Model.getBlockingBoardIdsForColour board) pieceColours
+
+
+otherColours : PieceColour -> List PieceColour
+otherColours pieceColour =
+    List.filter ((/=) pieceColour) Model.pieceColourPossibilities
 
 
 shuffle : Seed -> List a -> List a
