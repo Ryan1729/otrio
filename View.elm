@@ -170,11 +170,18 @@ view model =
                     , ( "flex-direction", "row" )
                     ]
                 ]
-        , model
-            |> .board
-            |> Model.getWinner
-            |> toString
-            |> text
+        , case
+            model
+                |> .board
+                |> Model.getWinner
+          of
+            Just winner ->
+                toString winner
+                    ++ " wins"
+                    |> text
+
+            Nothing ->
+                text ""
         ]
 
 
