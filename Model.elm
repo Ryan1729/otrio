@@ -168,6 +168,18 @@ getRackSection index rack =
             rack.third
 
 
+setRackSection (RackId index size) newValue rack =
+    case index of
+        0 ->
+            { rack | first = setSectionValue size newValue rack.first }
+
+        1 ->
+            { rack | second = setSectionValue size newValue rack.second }
+
+        _ ->
+            { rack | third = setSectionValue size newValue rack.third }
+
+
 emptyRack =
     Rack emptyRackSection emptyRackSection emptyRackSection
 
@@ -197,7 +209,11 @@ type Size
 placeAt : PieceColour -> RackId -> BoardId -> Model -> Maybe Model
 placeAt pieceColour rackId boardId model =
     if sizesMatch rackId boardId && getRackSectionValue pieceColour rackId model then
-        Just { model | board = setBoardSectionValue pieceColour boardId model.board }
+        let
+            postRackSetModel =
+                setRackSectionValue pieceColour rackId False model
+        in
+            Just { postRackSetModel | board = setBoardSectionValue pieceColour boardId postRackSetModel.board }
     else
         Nothing
 
@@ -244,6 +260,22 @@ getRackSectionValue pieceColour (RackId index size) model =
         |> getRackByPieceColour pieceColour
         |> getRackSection index
         |> getSectionValue size
+
+
+setRackSectionValue : PieceColour -> RackId -> Bool -> Model -> Model
+setRackSectionValue pieceColour rackId newValue model =
+    case pieceColour of
+        Red ->
+            { model | redRack = setRackSection rackId newValue model.redRack }
+
+        Green ->
+            { model | greenRack = setRackSection rackId newValue model.greenRack }
+
+        Blue ->
+            { model | blueRack = setRackSection rackId newValue model.blueRack }
+
+        Yellow ->
+            { model | yellowRack = setRackSection rackId newValue model.yellowRack }
 
 
 getRackByPieceColour pieceColour model =
