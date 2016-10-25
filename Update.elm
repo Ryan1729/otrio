@@ -1,7 +1,7 @@
 module Update exposing (update)
 
 import Msg exposing (Msg(..))
-import Model exposing (Model, PieceColour(..), Board, RackId(..), BoardId(..), Size(..))
+import Model exposing (Model, PieceColour(..), Board, RackId(..), BoardId(..), Size(..), defaultState)
 import Material
 import Ports
 import Extras
@@ -13,6 +13,9 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
+
+        NewGame players ->
+            ( { defaultState | players = players, muted = model.muted }, Cmd.none )
 
         Place boardId ->
             if Model.isFree model.board boardId then
@@ -26,7 +29,12 @@ update msg model =
                                 ( model, Cmd.none )
 
                             Just newModel ->
-                                ( cpuMoves { newModel | selected = Nothing }, Ports.sound "clack" )
+                                ( cpuMoves { newModel | selected = Nothing }
+                                , if model.muted then
+                                    Cmd.none
+                                  else
+                                    Ports.sound "clack"
+                                )
             else
                 ( model, Cmd.none )
 
@@ -35,6 +43,9 @@ update msg model =
 
         Select rackId ->
             ( { model | selected = Just rackId }, Cmd.none )
+
+        ToggleMute ->
+            ( { model | muted = not model.muted }, Cmd.none )
 
 
 cpuMoves : Model -> Model

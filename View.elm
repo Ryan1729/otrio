@@ -6,6 +6,7 @@ import Html.Attributes exposing (style)
 import Msg exposing (Msg(..))
 import Material.Options as Options exposing (css)
 import Material.Button as Button
+import Material.Icon as Icon
 import Svg exposing (Svg, svg, circle, polygon, Attribute)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (onClick)
@@ -111,15 +112,42 @@ view model =
                 , ( "flex-direction", "row" )
                 ]
             ]
-            [ Button.render Mdl
-                [ 0 ]
-                model.mdl
-                [ Button.raised
-                , Button.ripple
-                , Button.onClick NoOp
-                , css "width" (sectionWidthString ++ "px")
+            [ div
+                [ Html.Attributes.style
+                    [ ( "display", "flex" )
+                    , ( "flex-direction", "column" )
+                    , ( "align-items", "center" )
+                    ]
                 ]
-                [ text "New Game" ]
+                [ text "New game"
+                , Button.render Mdl
+                    [ 2 ]
+                    model.mdl
+                    [ Button.raised
+                    , Button.ripple
+                    , Button.onClick (NewGame 2)
+                    , css "width" (sectionWidthString ++ "px")
+                    ]
+                    [ Icon.i "memory" ]
+                , Button.render Mdl
+                    [ 3 ]
+                    model.mdl
+                    [ Button.raised
+                    , Button.ripple
+                    , Button.onClick (NewGame 3)
+                    , css "width" (sectionWidthString ++ "px")
+                    ]
+                    [ Icon.i "memory", Icon.i "memory" ]
+                , Button.render Mdl
+                    [ 4 ]
+                    model.mdl
+                    [ Button.raised
+                    , Button.ripple
+                    , Button.onClick (NewGame 4)
+                    , css "width" (sectionWidthString ++ "px")
+                    ]
+                    [ Icon.i "memory", Icon.i "memory", Icon.i "memory" ]
+                ]
             , rackDescription red model.redRack
                 |> List.indexedMap rackSectionView
                 |> div
@@ -129,14 +157,19 @@ view model =
                         ]
                     ]
             , Button.render Mdl
-                [ 1 ]
+                [ 0 ]
                 model.mdl
-                [ Button.raised
+                [ Button.icon
                 , Button.ripple
-                , Button.onClick NoOp
+                , Button.onClick ToggleMute
                 , css "width" (sectionWidthString ++ "px")
                 ]
-                [ text "Mute" ]
+                [ Icon.i
+                    <| if model.muted then
+                        "volume_mute"
+                       else
+                        "volume_up"
+                ]
             ]
         , div
             [ Html.Attributes.style

@@ -13,6 +13,7 @@ type alias Model =
     , yellowRack : Rack
     , selected : Maybe RackId
     , players : Int
+    , muted : Bool
     }
 
 
@@ -25,6 +26,7 @@ defaultState =
     , yellowRack = fullRack
     , selected = Nothing
     , players = 3
+    , muted = False
     }
 
 
