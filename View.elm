@@ -152,7 +152,7 @@ view model =
                         , ( "flex-direction", "column" )
                         ]
                     ]
-            , boardView model.board
+            , boardView (getSelectedSize model) model.board
             , rackDescription yellow model.yellowRack
                 |> List.indexedMap rackSectionView
                 |> div
@@ -178,8 +178,14 @@ view model =
         ]
 
 
-boardView : Board -> Html Msg
-boardView board =
+getSelectedSize : Model -> Maybe Size
+getSelectedSize model =
+    model.selected
+        |> Maybe.map (\(RackId _ size) -> size)
+
+
+boardView : Maybe Size -> Board -> Html Msg
+boardView selectedSize board =
     div
         [ Html.Attributes.style
             [ ( "display", "flex" )
@@ -194,13 +200,13 @@ boardView board =
             ]
             [ board.topLeft
                 |> boardSectionDescription
-                |> boardSectionView TopLeft
+                |> boardSectionView selectedSize TopLeft
             , board.topMiddle
                 |> boardSectionDescription
-                |> boardSectionView TopMiddle
+                |> boardSectionView selectedSize TopMiddle
             , board.topRight
                 |> boardSectionDescription
-                |> boardSectionView TopRight
+                |> boardSectionView selectedSize TopRight
             ]
         , div
             [ Html.Attributes.style
@@ -210,13 +216,13 @@ boardView board =
             ]
             [ board.leftMiddle
                 |> boardSectionDescription
-                |> boardSectionView LeftMiddle
+                |> boardSectionView selectedSize LeftMiddle
             , board.middle
                 |> boardSectionDescription
-                |> boardSectionView Middle
+                |> boardSectionView selectedSize Middle
             , board.rightMiddle
                 |> boardSectionDescription
-                |> boardSectionView RightMiddle
+                |> boardSectionView selectedSize RightMiddle
             ]
         , div
             [ Html.Attributes.style
@@ -226,13 +232,13 @@ boardView board =
             ]
             [ board.bottomLeft
                 |> boardSectionDescription
-                |> boardSectionView BottomLeft
+                |> boardSectionView selectedSize BottomLeft
             , board.bottomMiddle
                 |> boardSectionDescription
-                |> boardSectionView BottomMiddle
+                |> boardSectionView selectedSize BottomMiddle
             , board.bottomRight
                 |> boardSectionDescription
-                |> boardSectionView BottomRight
+                |> boardSectionView selectedSize BottomRight
             ]
         ]
 
@@ -259,8 +265,8 @@ boardSectionDescription section =
         (descriptionFromBoardState section.small)
 
 
-boardSectionView : BoardLocation -> RingsDescription -> Html Msg
-boardSectionView location (RingsDescription largeDescription mediumDescription smallDescription) =
+boardSectionView : Maybe Size -> BoardLocation -> RingsDescription -> Html Msg
+boardSectionView selectedSize location (RingsDescription largeDescription mediumDescription smallDescription) =
     svg [ width sectionWidthString, height sectionHeightString, viewBox viewBoxString ]
         [ case largeDescription of
             Colour colour ->
@@ -273,7 +279,7 @@ boardSectionView location (RingsDescription largeDescription mediumDescription s
                         |> onClick
                     , fillOpacity "0.1"
                     , d largeRing
-                    , stroke "grey"
+                    , getBoardStroke Large selectedSize
                     ]
         , case mediumDescription of
             Colour colour ->
@@ -286,7 +292,7 @@ boardSectionView location (RingsDescription largeDescription mediumDescription s
                         |> onClick
                     , fillOpacity "0.1"
                     , d mediumRing
-                    , stroke "grey"
+                    , getBoardStroke Medium selectedSize
                     ]
         , case smallDescription of
             Colour colour ->
@@ -304,14 +310,22 @@ boardSectionView location (RingsDescription largeDescription mediumDescription s
                     [ cx halfSectionWidthString
                     , cy halfSectionWidthString
                     , r <| toString (halfSectionWidth * 1 / 9)
-                    , stroke "grey"
                     , BoardId location Small
                         |> Place
                         |> onClick
                     , fillOpacity "0.1"
+                    , getBoardStroke Small selectedSize
                     ]
                     []
         ]
+
+
+getBoardStroke : Size -> Maybe Size -> Svg.Attribute msg
+getBoardStroke highlightSize selectedSize =
+    if selectedSize == Just highlightSize then
+        stroke "white"
+    else
+        stroke "grey"
 
 
 rackSectionView =

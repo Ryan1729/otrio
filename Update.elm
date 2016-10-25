@@ -24,7 +24,7 @@ update msg model =
                                 ( model, Cmd.none )
 
                             Just newModel ->
-                                ( newModel, Ports.sound "clack" )
+                                ( { newModel | selected = Nothing }, Ports.sound "clack" )
             else
                 ( model, Cmd.none )
 
