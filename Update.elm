@@ -57,15 +57,18 @@ cpuMoves model =
 takeMove : PieceColour -> Model -> Model
 takeMove pieceColour model =
     let
+        maybeWinner =
+            Model.getWinner model.board
+
         maybeMove =
             findMove pieceColour model
     in
-        case maybeMove of
-            Just ( rackId, boardId ) ->
+        case ( maybeWinner, maybeMove ) of
+            ( Nothing, Just ( rackId, boardId ) ) ->
                 Model.placeAt pieceColour rackId boardId model
                     |> Maybe.withDefault model
 
-            Nothing ->
+            _ ->
                 model
 
 

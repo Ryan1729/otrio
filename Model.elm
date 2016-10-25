@@ -24,7 +24,7 @@ defaultState =
     , blueRack = fullRack
     , yellowRack = fullRack
     , selected = Nothing
-    , players = 2
+    , players = 3
     }
 
 
