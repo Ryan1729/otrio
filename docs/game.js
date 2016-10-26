@@ -15434,6 +15434,35 @@ var _user$project$View$view = function (model) {
 						_elm_lang$html$Html_Attributes$style(
 						_elm_lang$core$Native_List.fromArray(
 							[
+								{ctor: '_Tuple2', _0: 'font-size', _1: '200%'},
+								{ctor: '_Tuple2', _0: 'margin-top', _1: '1vh'}
+							]))
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						function () {
+						var _p15 = _user$project$Model$getWinner(
+							function (_) {
+								return _.board;
+							}(model));
+						if (_p15.ctor === 'Just') {
+							return _elm_lang$html$Html$text(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(_p15._0),
+									' wins'));
+						} else {
+							return _elm_lang$html$Html$text('');
+						}
+					}()
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$style(
+						_elm_lang$core$Native_List.fromArray(
+							[
 								{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
 								{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
 							]))
@@ -15621,22 +15650,7 @@ var _user$project$View$view = function (model) {
 				A2(
 					_elm_lang$core$List$indexedMap,
 					_user$project$View$playerRackSectionView(model.selected),
-					A2(_user$project$View$rackDescription, _user$project$View$blue, model.blueRack))),
-				function () {
-				var _p15 = _user$project$Model$getWinner(
-					function (_) {
-						return _.board;
-					}(model));
-				if (_p15.ctor === 'Just') {
-					return _elm_lang$html$Html$text(
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(_p15._0),
-							' wins'));
-				} else {
-					return _elm_lang$html$Html$text('');
-				}
-			}()
+					A2(_user$project$View$rackDescription, _user$project$View$blue, model.blueRack)))
 			]));
 };
 
