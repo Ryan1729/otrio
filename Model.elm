@@ -406,7 +406,7 @@ hasMatchOfGivenColour board pieceColour =
                     getLines board
                in
                 List.any (matchingLine boardState) lines
-                    || List.any (oneOfEachLine boardState) lines
+                    || List.any (ascendingOrderLine boardState) lines
 
 
 getBoardSections : Board -> List (Section BoardState)
@@ -426,16 +426,11 @@ matchingLine boardState line =
         || List.all (.small >> (==) boardState) line
 
 
-oneOfEachLine : BoardState -> List (Section BoardState) -> Bool
-oneOfEachLine boardState line =
+ascendingOrderLine : BoardState -> List (Section BoardState) -> Bool
+ascendingOrderLine boardState line =
     case line of
         first :: second :: third :: _ ->
-            --TODO remove duplicate record acceses
             (first.small == boardState && second.medium == boardState && third.large == boardState)
-                || (first.small == boardState && second.large == boardState && third.medium == boardState)
-                || (first.medium == boardState && second.small == boardState && third.large == boardState)
-                || (first.medium == boardState && second.large == boardState && third.small == boardState)
-                || (first.large == boardState && second.small == boardState && third.medium == boardState)
                 || (first.large == boardState && second.medium == boardState && third.small == boardState)
 
         _ ->
