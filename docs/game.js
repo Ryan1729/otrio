@@ -14429,14 +14429,14 @@ var _user$project$Model$completeSection = F2(
 	function (boardState, section) {
 		return _elm_lang$core$Native_Utils.eq(section.large, boardState) && (_elm_lang$core$Native_Utils.eq(section.medium, boardState) && _elm_lang$core$Native_Utils.eq(section.small, boardState));
 	});
-var _user$project$Model$oneOfEachLine = F2(
+var _user$project$Model$ascendingOrderLine = F2(
 	function (boardState, line) {
 		var _p0 = line;
 		if (((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '::')) {
 			var _p3 = _p0._1._1._0;
 			var _p2 = _p0._1._0;
 			var _p1 = _p0._0;
-			return (_elm_lang$core$Native_Utils.eq(_p1.small, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.medium, boardState) && _elm_lang$core$Native_Utils.eq(_p3.large, boardState))) || ((_elm_lang$core$Native_Utils.eq(_p1.small, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.large, boardState) && _elm_lang$core$Native_Utils.eq(_p3.medium, boardState))) || ((_elm_lang$core$Native_Utils.eq(_p1.medium, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.small, boardState) && _elm_lang$core$Native_Utils.eq(_p3.large, boardState))) || ((_elm_lang$core$Native_Utils.eq(_p1.medium, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.large, boardState) && _elm_lang$core$Native_Utils.eq(_p3.small, boardState))) || ((_elm_lang$core$Native_Utils.eq(_p1.large, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.small, boardState) && _elm_lang$core$Native_Utils.eq(_p3.medium, boardState))) || (_elm_lang$core$Native_Utils.eq(_p1.large, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.medium, boardState) && _elm_lang$core$Native_Utils.eq(_p3.small, boardState)))))));
+			return (_elm_lang$core$Native_Utils.eq(_p1.small, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.medium, boardState) && _elm_lang$core$Native_Utils.eq(_p3.large, boardState))) || (_elm_lang$core$Native_Utils.eq(_p1.large, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.medium, boardState) && _elm_lang$core$Native_Utils.eq(_p3.small, boardState)));
 		} else {
 			return false;
 		}
@@ -14862,7 +14862,7 @@ var _user$project$Model$hasMatchOfGivenColour = F2(
 				_user$project$Model$matchingLine(boardState),
 				lines) || A2(
 				_elm_lang$core$List$any,
-				_user$project$Model$oneOfEachLine(boardState),
+				_user$project$Model$ascendingOrderLine(boardState),
 				lines);
 		}();
 	});
