@@ -108,6 +108,25 @@ view model =
         ]
         [ div
             [ Html.Attributes.style
+                [ ( "font-size", "200%" )
+                , ( "margin-top", "1vh" )
+                ]
+            ]
+            [ case
+                model
+                    |> .board
+                    |> Model.getWinner
+              of
+                Just winner ->
+                    toString winner
+                        ++ " wins"
+                        |> text
+
+                Nothing ->
+                    text ""
+            ]
+        , div
+            [ Html.Attributes.style
                 [ ( "display", "flex" )
                 , ( "flex-direction", "row" )
                 ]
@@ -203,18 +222,6 @@ view model =
                     , ( "flex-direction", "row" )
                     ]
                 ]
-        , case
-            model
-                |> .board
-                |> Model.getWinner
-          of
-            Just winner ->
-                toString winner
-                    ++ " wins"
-                    |> text
-
-            Nothing ->
-                text ""
         ]
 
 
