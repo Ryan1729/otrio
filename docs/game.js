@@ -13392,6 +13392,28 @@ var _debois$elm_mdl$Material$Model = F8(
 		return {button: a, textfield: b, menu: c, snackbar: d, layout: e, toggles: f, tooltip: g, tabs: h};
 	});
 
+var _elm_lang$core$Native_Bitwise = function() {
+
+return {
+	and: F2(function and(a, b) { return a & b; }),
+	or: F2(function or(a, b) { return a | b; }),
+	xor: F2(function xor(a, b) { return a ^ b; }),
+	complement: function complement(a) { return ~a; },
+	shiftLeft: F2(function sll(a, offset) { return a << offset; }),
+	shiftRightArithmatic: F2(function sra(a, offset) { return a >> offset; }),
+	shiftRightLogical: F2(function srl(a, offset) { return a >>> offset; })
+};
+
+}();
+
+var _elm_lang$core$Bitwise$shiftRightLogical = _elm_lang$core$Native_Bitwise.shiftRightLogical;
+var _elm_lang$core$Bitwise$shiftRight = _elm_lang$core$Native_Bitwise.shiftRightArithmatic;
+var _elm_lang$core$Bitwise$shiftLeft = _elm_lang$core$Native_Bitwise.shiftLeft;
+var _elm_lang$core$Bitwise$complement = _elm_lang$core$Native_Bitwise.complement;
+var _elm_lang$core$Bitwise$xor = _elm_lang$core$Native_Bitwise.xor;
+var _elm_lang$core$Bitwise$or = _elm_lang$core$Native_Bitwise.or;
+var _elm_lang$core$Bitwise$and = _elm_lang$core$Native_Bitwise.and;
+
 var _elm_lang$svg$Svg$text = _elm_lang$virtual_dom$VirtualDom$text;
 var _elm_lang$svg$Svg$svgNamespace = A2(
 	_elm_lang$virtual_dom$VirtualDom$property,
@@ -13768,10 +13790,704 @@ var _elm_lang$svg$Svg_Events$onMouseOut = _elm_lang$svg$Svg_Events$simpleOn('mou
 var _elm_lang$svg$Svg_Events$onMouseOver = _elm_lang$svg$Svg_Events$simpleOn('mouseover');
 var _elm_lang$svg$Svg_Events$onMouseUp = _elm_lang$svg$Svg_Events$simpleOn('mouseup');
 
+var _mgold$elm_random_pcg$Random_Pcg$toJson = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Json_Encode$list(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$core$Json_Encode$int(_p1._0),
+				_elm_lang$core$Json_Encode$int(_p1._1)
+			]));
+};
+var _mgold$elm_random_pcg$Random_Pcg$mul32 = F2(
+	function (a, b) {
+		var bl = A2(_elm_lang$core$Bitwise$and, b, 65535);
+		var bh = A2(
+			_elm_lang$core$Bitwise$and,
+			A2(_elm_lang$core$Bitwise$shiftRightLogical, b, 16),
+			65535);
+		var al = A2(_elm_lang$core$Bitwise$and, a, 65535);
+		var ah = A2(
+			_elm_lang$core$Bitwise$and,
+			A2(_elm_lang$core$Bitwise$shiftRightLogical, a, 16),
+			65535);
+		return A2(
+			_elm_lang$core$Bitwise$or,
+			0,
+			(al * bl) + A2(
+				_elm_lang$core$Bitwise$shiftRightLogical,
+				A2(_elm_lang$core$Bitwise$shiftLeft, (ah * bl) + (al * bh), 16),
+				0));
+	});
+var _mgold$elm_random_pcg$Random_Pcg$listHelp = F4(
+	function (list, n, generate, seed) {
+		listHelp:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(n, 1) < 0) {
+				return {ctor: '_Tuple2', _0: list, _1: seed};
+			} else {
+				var _p2 = generate(seed);
+				var value = _p2._0;
+				var newSeed = _p2._1;
+				var _v1 = A2(_elm_lang$core$List_ops['::'], value, list),
+					_v2 = n - 1,
+					_v3 = generate,
+					_v4 = newSeed;
+				list = _v1;
+				n = _v2;
+				generate = _v3;
+				seed = _v4;
+				continue listHelp;
+			}
+		}
+	});
+var _mgold$elm_random_pcg$Random_Pcg$minInt = -2147483648;
+var _mgold$elm_random_pcg$Random_Pcg$maxInt = 2147483647;
+var _mgold$elm_random_pcg$Random_Pcg$bit27 = 1.34217728e8;
+var _mgold$elm_random_pcg$Random_Pcg$bit53 = 9.007199254740992e15;
+var _mgold$elm_random_pcg$Random_Pcg$peel = function (_p3) {
+	var _p4 = _p3;
+	var _p5 = _p4._0;
+	var word = A2(
+		_elm_lang$core$Bitwise$xor,
+		A2(
+			_elm_lang$core$Bitwise$shiftRightLogical,
+			_p5,
+			A2(_elm_lang$core$Bitwise$shiftRightLogical, _p5, 28) + 4),
+		_p5) * 277803737;
+	return A2(
+		_elm_lang$core$Bitwise$shiftRightLogical,
+		A2(
+			_elm_lang$core$Bitwise$xor,
+			A2(_elm_lang$core$Bitwise$shiftRightLogical, word, 22),
+			word),
+		0);
+};
+var _mgold$elm_random_pcg$Random_Pcg$never = function (a) {
+	never:
+	while (true) {
+		var _v6 = a;
+		a = _v6;
+		continue never;
+	}
+};
+var _mgold$elm_random_pcg$Random_Pcg$step = F2(
+	function (_p6, seed) {
+		var _p7 = _p6;
+		return _p7._0(seed);
+	});
+var _mgold$elm_random_pcg$Random_Pcg$retry = F3(
+	function (generator, predicate, seed) {
+		retry:
+		while (true) {
+			var _p8 = A2(_mgold$elm_random_pcg$Random_Pcg$step, generator, seed);
+			var candidate = _p8._0;
+			var newSeed = _p8._1;
+			if (predicate(candidate)) {
+				return {ctor: '_Tuple2', _0: candidate, _1: newSeed};
+			} else {
+				var _v8 = generator,
+					_v9 = predicate,
+					_v10 = newSeed;
+				generator = _v8;
+				predicate = _v9;
+				seed = _v10;
+				continue retry;
+			}
+		}
+	});
+var _mgold$elm_random_pcg$Random_Pcg$Generator = function (a) {
+	return {ctor: 'Generator', _0: a};
+};
+var _mgold$elm_random_pcg$Random_Pcg$list = F2(
+	function (n, _p9) {
+		var _p10 = _p9;
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			function (seed) {
+				return A4(
+					_mgold$elm_random_pcg$Random_Pcg$listHelp,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					n,
+					_p10._0,
+					seed);
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$constant = function (value) {
+	return _mgold$elm_random_pcg$Random_Pcg$Generator(
+		function (seed) {
+			return {ctor: '_Tuple2', _0: value, _1: seed};
+		});
+};
+var _mgold$elm_random_pcg$Random_Pcg$map = F2(
+	function (func, _p11) {
+		var _p12 = _p11;
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			function (seed0) {
+				var _p13 = _p12._0(seed0);
+				var a = _p13._0;
+				var seed1 = _p13._1;
+				return {
+					ctor: '_Tuple2',
+					_0: func(a),
+					_1: seed1
+				};
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$map2 = F3(
+	function (func, _p15, _p14) {
+		var _p16 = _p15;
+		var _p17 = _p14;
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			function (seed0) {
+				var _p18 = _p16._0(seed0);
+				var a = _p18._0;
+				var seed1 = _p18._1;
+				var _p19 = _p17._0(seed1);
+				var b = _p19._0;
+				var seed2 = _p19._1;
+				return {
+					ctor: '_Tuple2',
+					_0: A2(func, a, b),
+					_1: seed2
+				};
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$pair = F2(
+	function (genA, genB) {
+		return A3(
+			_mgold$elm_random_pcg$Random_Pcg$map2,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			genA,
+			genB);
+	});
+var _mgold$elm_random_pcg$Random_Pcg$andMap = _mgold$elm_random_pcg$Random_Pcg$map2(
+	F2(
+		function (x, y) {
+			return x(y);
+		}));
+var _mgold$elm_random_pcg$Random_Pcg$map3 = F4(
+	function (func, _p22, _p21, _p20) {
+		var _p23 = _p22;
+		var _p24 = _p21;
+		var _p25 = _p20;
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			function (seed0) {
+				var _p26 = _p23._0(seed0);
+				var a = _p26._0;
+				var seed1 = _p26._1;
+				var _p27 = _p24._0(seed1);
+				var b = _p27._0;
+				var seed2 = _p27._1;
+				var _p28 = _p25._0(seed2);
+				var c = _p28._0;
+				var seed3 = _p28._1;
+				return {
+					ctor: '_Tuple2',
+					_0: A3(func, a, b, c),
+					_1: seed3
+				};
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$map4 = F5(
+	function (func, _p32, _p31, _p30, _p29) {
+		var _p33 = _p32;
+		var _p34 = _p31;
+		var _p35 = _p30;
+		var _p36 = _p29;
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			function (seed0) {
+				var _p37 = _p33._0(seed0);
+				var a = _p37._0;
+				var seed1 = _p37._1;
+				var _p38 = _p34._0(seed1);
+				var b = _p38._0;
+				var seed2 = _p38._1;
+				var _p39 = _p35._0(seed2);
+				var c = _p39._0;
+				var seed3 = _p39._1;
+				var _p40 = _p36._0(seed3);
+				var d = _p40._0;
+				var seed4 = _p40._1;
+				return {
+					ctor: '_Tuple2',
+					_0: A4(func, a, b, c, d),
+					_1: seed4
+				};
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$map5 = F6(
+	function (func, _p45, _p44, _p43, _p42, _p41) {
+		var _p46 = _p45;
+		var _p47 = _p44;
+		var _p48 = _p43;
+		var _p49 = _p42;
+		var _p50 = _p41;
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			function (seed0) {
+				var _p51 = _p46._0(seed0);
+				var a = _p51._0;
+				var seed1 = _p51._1;
+				var _p52 = _p47._0(seed1);
+				var b = _p52._0;
+				var seed2 = _p52._1;
+				var _p53 = _p48._0(seed2);
+				var c = _p53._0;
+				var seed3 = _p53._1;
+				var _p54 = _p49._0(seed3);
+				var d = _p54._0;
+				var seed4 = _p54._1;
+				var _p55 = _p50._0(seed4);
+				var e = _p55._0;
+				var seed5 = _p55._1;
+				return {
+					ctor: '_Tuple2',
+					_0: A5(func, a, b, c, d, e),
+					_1: seed5
+				};
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$andThen = F2(
+	function (_p56, callback) {
+		var _p57 = _p56;
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			function (seed) {
+				var _p58 = _p57._0(seed);
+				var result = _p58._0;
+				var newSeed = _p58._1;
+				var _p59 = callback(result);
+				var generateB = _p59._0;
+				return generateB(newSeed);
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$maybe = F2(
+	function (genBool, genA) {
+		return A2(
+			_mgold$elm_random_pcg$Random_Pcg$andThen,
+			genBool,
+			function (b) {
+				return b ? A2(_mgold$elm_random_pcg$Random_Pcg$map, _elm_lang$core$Maybe$Just, genA) : _mgold$elm_random_pcg$Random_Pcg$constant(_elm_lang$core$Maybe$Nothing);
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$filter = F2(
+	function (predicate, generator) {
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			A2(_mgold$elm_random_pcg$Random_Pcg$retry, generator, predicate));
+	});
+var _mgold$elm_random_pcg$Random_Pcg$Seed = F2(
+	function (a, b) {
+		return {ctor: 'Seed', _0: a, _1: b};
+	});
+var _mgold$elm_random_pcg$Random_Pcg$next = function (_p60) {
+	var _p61 = _p60;
+	var _p62 = _p61._1;
+	return A2(
+		_mgold$elm_random_pcg$Random_Pcg$Seed,
+		A2(_elm_lang$core$Bitwise$shiftRightLogical, (_p61._0 * 1664525) + _p62, 0),
+		_p62);
+};
+var _mgold$elm_random_pcg$Random_Pcg$initialSeed = function (x) {
+	var _p63 = _mgold$elm_random_pcg$Random_Pcg$next(
+		A2(_mgold$elm_random_pcg$Random_Pcg$Seed, 0, 1013904223));
+	var state1 = _p63._0;
+	var incr = _p63._1;
+	var state2 = A2(_elm_lang$core$Bitwise$shiftRightLogical, state1 + x, 0);
+	return _mgold$elm_random_pcg$Random_Pcg$next(
+		A2(_mgold$elm_random_pcg$Random_Pcg$Seed, state2, incr));
+};
+var _mgold$elm_random_pcg$Random_Pcg$generate = F2(
+	function (toMsg, generator) {
+		return A3(
+			_elm_lang$core$Task$perform,
+			_mgold$elm_random_pcg$Random_Pcg$never,
+			toMsg,
+			A2(
+				_elm_lang$core$Task$map,
+				function (_p64) {
+					return _elm_lang$core$Basics$fst(
+						A2(
+							_mgold$elm_random_pcg$Random_Pcg$step,
+							generator,
+							_mgold$elm_random_pcg$Random_Pcg$initialSeed(
+								_elm_lang$core$Basics$round(_p64))));
+				},
+				_elm_lang$core$Time$now));
+	});
+var _mgold$elm_random_pcg$Random_Pcg$int = F2(
+	function (a, b) {
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			function (seed0) {
+				var _p65 = (_elm_lang$core$Native_Utils.cmp(a, b) < 0) ? {ctor: '_Tuple2', _0: a, _1: b} : {ctor: '_Tuple2', _0: b, _1: a};
+				var lo = _p65._0;
+				var hi = _p65._1;
+				var range = (hi - lo) + 1;
+				if (_elm_lang$core$Native_Utils.eq(
+					A2(_elm_lang$core$Bitwise$and, range, range - 1),
+					0)) {
+					return {
+						ctor: '_Tuple2',
+						_0: A2(
+							_elm_lang$core$Bitwise$shiftRightLogical,
+							A2(
+								_elm_lang$core$Bitwise$and,
+								_mgold$elm_random_pcg$Random_Pcg$peel(seed0),
+								range - 1),
+							0) + lo,
+						_1: _mgold$elm_random_pcg$Random_Pcg$next(seed0)
+					};
+				} else {
+					var threshhold = A2(
+						_elm_lang$core$Bitwise$shiftRightLogical,
+						A2(
+							_elm_lang$core$Basics$rem,
+							A2(_elm_lang$core$Bitwise$shiftRightLogical, 0 - range, 0),
+							range),
+						0);
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var seedN = _mgold$elm_random_pcg$Random_Pcg$next(seed);
+							var x = _mgold$elm_random_pcg$Random_Pcg$peel(seed);
+							if (_elm_lang$core$Native_Utils.cmp(x, threshhold) < 0) {
+								var _v29 = seedN;
+								seed = _v29;
+								continue accountForBias;
+							} else {
+								return {
+									ctor: '_Tuple2',
+									_0: A2(_elm_lang$core$Basics$rem, x, range) + lo,
+									_1: seedN
+								};
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$bool = A2(
+	_mgold$elm_random_pcg$Random_Pcg$map,
+	F2(
+		function (x, y) {
+			return _elm_lang$core$Native_Utils.eq(x, y);
+		})(1),
+	A2(_mgold$elm_random_pcg$Random_Pcg$int, 0, 1));
+var _mgold$elm_random_pcg$Random_Pcg$choice = F2(
+	function (x, y) {
+		return A2(
+			_mgold$elm_random_pcg$Random_Pcg$map,
+			function (b) {
+				return b ? x : y;
+			},
+			_mgold$elm_random_pcg$Random_Pcg$bool);
+	});
+var _mgold$elm_random_pcg$Random_Pcg$oneIn = function (n) {
+	return A2(
+		_mgold$elm_random_pcg$Random_Pcg$map,
+		F2(
+			function (x, y) {
+				return _elm_lang$core$Native_Utils.eq(x, y);
+			})(1),
+		A2(_mgold$elm_random_pcg$Random_Pcg$int, 1, n));
+};
+var _mgold$elm_random_pcg$Random_Pcg$sample = function () {
+	var find = F2(
+		function (k, ys) {
+			find:
+			while (true) {
+				var _p66 = ys;
+				if (_p66.ctor === '[]') {
+					return _elm_lang$core$Maybe$Nothing;
+				} else {
+					if (_elm_lang$core$Native_Utils.eq(k, 0)) {
+						return _elm_lang$core$Maybe$Just(_p66._0);
+					} else {
+						var _v31 = k - 1,
+							_v32 = _p66._1;
+						k = _v31;
+						ys = _v32;
+						continue find;
+					}
+				}
+			}
+		});
+	return function (xs) {
+		return A2(
+			_mgold$elm_random_pcg$Random_Pcg$map,
+			function (i) {
+				return A2(find, i, xs);
+			},
+			A2(
+				_mgold$elm_random_pcg$Random_Pcg$int,
+				0,
+				_elm_lang$core$List$length(xs) - 1));
+	};
+}();
+var _mgold$elm_random_pcg$Random_Pcg$float = F2(
+	function (min, max) {
+		return _mgold$elm_random_pcg$Random_Pcg$Generator(
+			function (seed0) {
+				var range = _elm_lang$core$Basics$abs(max - min);
+				var n0 = _mgold$elm_random_pcg$Random_Pcg$peel(seed0);
+				var hi = _elm_lang$core$Basics$toFloat(
+					A2(_elm_lang$core$Bitwise$and, n0, 67108863)) * 1.0;
+				var seed1 = _mgold$elm_random_pcg$Random_Pcg$next(seed0);
+				var n1 = _mgold$elm_random_pcg$Random_Pcg$peel(seed1);
+				var lo = _elm_lang$core$Basics$toFloat(
+					A2(_elm_lang$core$Bitwise$and, n1, 134217727)) * 1.0;
+				var val = ((hi * _mgold$elm_random_pcg$Random_Pcg$bit27) + lo) / _mgold$elm_random_pcg$Random_Pcg$bit53;
+				var scaled = (val * range) + min;
+				return {
+					ctor: '_Tuple2',
+					_0: scaled,
+					_1: _mgold$elm_random_pcg$Random_Pcg$next(seed1)
+				};
+			});
+	});
+var _mgold$elm_random_pcg$Random_Pcg$frequency = function (pairs) {
+	var pick = F2(
+		function (choices, n) {
+			pick:
+			while (true) {
+				var _p67 = choices;
+				if ((_p67.ctor === '::') && (_p67._0.ctor === '_Tuple2')) {
+					var _p68 = _p67._0._0;
+					if (_elm_lang$core$Native_Utils.cmp(n, _p68) < 1) {
+						return _p67._0._1;
+					} else {
+						var _v34 = _p67._1,
+							_v35 = n - _p68;
+						choices = _v34;
+						n = _v35;
+						continue pick;
+					}
+				} else {
+					return _elm_lang$core$Native_Utils.crashCase(
+						'Random.Pcg',
+						{
+							start: {line: 688, column: 13},
+							end: {line: 696, column: 77}
+						},
+						_p67)('Empty list passed to Random.Pcg.frequency!');
+				}
+			}
+		});
+	var total = _elm_lang$core$List$sum(
+		A2(
+			_elm_lang$core$List$map,
+			function (_p70) {
+				return _elm_lang$core$Basics$abs(
+					_elm_lang$core$Basics$fst(_p70));
+			},
+			pairs));
+	return A2(
+		_mgold$elm_random_pcg$Random_Pcg$andThen,
+		A2(_mgold$elm_random_pcg$Random_Pcg$float, 0, total),
+		pick(pairs));
+};
+var _mgold$elm_random_pcg$Random_Pcg$choices = function (gens) {
+	return _mgold$elm_random_pcg$Random_Pcg$frequency(
+		A2(
+			_elm_lang$core$List$map,
+			function (g) {
+				return {ctor: '_Tuple2', _0: 1, _1: g};
+			},
+			gens));
+};
+var _mgold$elm_random_pcg$Random_Pcg$independentSeed = _mgold$elm_random_pcg$Random_Pcg$Generator(
+	function (seed0) {
+		var gen = A2(_mgold$elm_random_pcg$Random_Pcg$int, 0, 4294967295);
+		var _p71 = A2(
+			_mgold$elm_random_pcg$Random_Pcg$step,
+			A4(
+				_mgold$elm_random_pcg$Random_Pcg$map3,
+				F3(
+					function (v0, v1, v2) {
+						return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
+					}),
+				gen,
+				gen,
+				gen),
+			seed0);
+		var state = _p71._0._0;
+		var b = _p71._0._1;
+		var c = _p71._0._2;
+		var seed1 = _p71._1;
+		var incr = A2(
+			_elm_lang$core$Bitwise$or,
+			A2(_elm_lang$core$Bitwise$xor, b, c),
+			1);
+		return {
+			ctor: '_Tuple2',
+			_0: seed1,
+			_1: _mgold$elm_random_pcg$Random_Pcg$next(
+				A2(_mgold$elm_random_pcg$Random_Pcg$Seed, state, incr))
+		};
+	});
+var _mgold$elm_random_pcg$Random_Pcg$fastForward = F2(
+	function (delta0, _p72) {
+		var _p73 = _p72;
+		var _p76 = _p73._1;
+		var helper = F6(
+			function (accMult, accPlus, curMult, curPlus, delta, repeat) {
+				helper:
+				while (true) {
+					var newDelta = A2(_elm_lang$core$Bitwise$shiftRightLogical, delta, 1);
+					var curMult$ = A2(_mgold$elm_random_pcg$Random_Pcg$mul32, curMult, curMult);
+					var curPlus$ = A2(_mgold$elm_random_pcg$Random_Pcg$mul32, curMult + 1, curPlus);
+					var _p74 = _elm_lang$core$Native_Utils.eq(
+						A2(_elm_lang$core$Bitwise$and, delta, 1),
+						1) ? {
+						ctor: '_Tuple2',
+						_0: A2(_mgold$elm_random_pcg$Random_Pcg$mul32, accMult, curMult),
+						_1: A2(
+							_elm_lang$core$Bitwise$shiftRightLogical,
+							A2(_mgold$elm_random_pcg$Random_Pcg$mul32, accPlus, curMult) + curPlus,
+							0)
+					} : {ctor: '_Tuple2', _0: accMult, _1: accPlus};
+					var accMult$ = _p74._0;
+					var accPlus$ = _p74._1;
+					if (_elm_lang$core$Native_Utils.eq(newDelta, 0)) {
+						if ((_elm_lang$core$Native_Utils.cmp(delta0, 0) < 0) && repeat) {
+							var _v37 = accMult$,
+								_v38 = accPlus$,
+								_v39 = curMult$,
+								_v40 = curPlus$,
+								_v41 = -1,
+								_v42 = false;
+							accMult = _v37;
+							accPlus = _v38;
+							curMult = _v39;
+							curPlus = _v40;
+							delta = _v41;
+							repeat = _v42;
+							continue helper;
+						} else {
+							return {ctor: '_Tuple2', _0: accMult$, _1: accPlus$};
+						}
+					} else {
+						var _v43 = accMult$,
+							_v44 = accPlus$,
+							_v45 = curMult$,
+							_v46 = curPlus$,
+							_v47 = newDelta,
+							_v48 = repeat;
+						accMult = _v43;
+						accPlus = _v44;
+						curMult = _v45;
+						curPlus = _v46;
+						delta = _v47;
+						repeat = _v48;
+						continue helper;
+					}
+				}
+			});
+		var _p75 = A6(helper, 1, 0, 1664525, _p76, delta0, true);
+		var accMultFinal = _p75._0;
+		var accPlusFinal = _p75._1;
+		return A2(
+			_mgold$elm_random_pcg$Random_Pcg$Seed,
+			A2(
+				_elm_lang$core$Bitwise$shiftRightLogical,
+				A2(_mgold$elm_random_pcg$Random_Pcg$mul32, accMultFinal, _p73._0) + accPlusFinal,
+				0),
+			_p76);
+	});
+var _mgold$elm_random_pcg$Random_Pcg$fromJson = _elm_lang$core$Json_Decode$oneOf(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A3(_elm_lang$core$Json_Decode$tuple2, _mgold$elm_random_pcg$Random_Pcg$Seed, _elm_lang$core$Json_Decode$int, _elm_lang$core$Json_Decode$int),
+			A2(_elm_lang$core$Json_Decode$map, _mgold$elm_random_pcg$Random_Pcg$initialSeed, _elm_lang$core$Json_Decode$int)
+		]));
+
+var _user$project$Extras$find = F2(
+	function (predicate, list) {
+		find:
+		while (true) {
+			var _p0 = list;
+			if (_p0.ctor === '[]') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				var _p1 = _p0._0;
+				if (predicate(_p1)) {
+					return _elm_lang$core$Maybe$Just(_p1);
+				} else {
+					var _v1 = predicate,
+						_v2 = _p0._1;
+					predicate = _v1;
+					list = _v2;
+					continue find;
+				}
+			}
+		}
+	});
+
+var _user$project$Model$completeSection = F2(
+	function (boardState, section) {
+		return _elm_lang$core$Native_Utils.eq(section.large, boardState) && (_elm_lang$core$Native_Utils.eq(section.medium, boardState) && _elm_lang$core$Native_Utils.eq(section.small, boardState));
+	});
+var _user$project$Model$oneOfEachLine = F2(
+	function (boardState, line) {
+		var _p0 = line;
+		if (((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '::')) {
+			var _p3 = _p0._1._1._0;
+			var _p2 = _p0._1._0;
+			var _p1 = _p0._0;
+			return (_elm_lang$core$Native_Utils.eq(_p1.small, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.medium, boardState) && _elm_lang$core$Native_Utils.eq(_p3.large, boardState))) || ((_elm_lang$core$Native_Utils.eq(_p1.small, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.large, boardState) && _elm_lang$core$Native_Utils.eq(_p3.medium, boardState))) || ((_elm_lang$core$Native_Utils.eq(_p1.medium, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.small, boardState) && _elm_lang$core$Native_Utils.eq(_p3.large, boardState))) || ((_elm_lang$core$Native_Utils.eq(_p1.medium, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.large, boardState) && _elm_lang$core$Native_Utils.eq(_p3.small, boardState))) || ((_elm_lang$core$Native_Utils.eq(_p1.large, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.small, boardState) && _elm_lang$core$Native_Utils.eq(_p3.medium, boardState))) || (_elm_lang$core$Native_Utils.eq(_p1.large, boardState) && (_elm_lang$core$Native_Utils.eq(_p2.medium, boardState) && _elm_lang$core$Native_Utils.eq(_p3.small, boardState)))))));
+		} else {
+			return false;
+		}
+	});
+var _user$project$Model$matchingLine = F2(
+	function (boardState, line) {
+		return A2(
+			_elm_lang$core$List$all,
+			function (_p4) {
+				return A2(
+					F2(
+						function (x, y) {
+							return _elm_lang$core$Native_Utils.eq(x, y);
+						}),
+					boardState,
+					function (_) {
+						return _.large;
+					}(_p4));
+			},
+			line) || (A2(
+			_elm_lang$core$List$all,
+			function (_p5) {
+				return A2(
+					F2(
+						function (x, y) {
+							return _elm_lang$core$Native_Utils.eq(x, y);
+						}),
+					boardState,
+					function (_) {
+						return _.medium;
+					}(_p5));
+			},
+			line) || A2(
+			_elm_lang$core$List$all,
+			function (_p6) {
+				return A2(
+					F2(
+						function (x, y) {
+							return _elm_lang$core$Native_Utils.eq(x, y);
+						}),
+					boardState,
+					function (_) {
+						return _.small;
+					}(_p6));
+			},
+			line));
+	});
 var _user$project$Model$getRackByPieceColour = F2(
 	function (pieceColour, model) {
-		var _p0 = pieceColour;
-		switch (_p0.ctor) {
+		var _p7 = pieceColour;
+		switch (_p7.ctor) {
 			case 'Red':
 				return model.redRack;
 			case 'Green':
@@ -13782,10 +14498,17 @@ var _user$project$Model$getRackByPieceColour = F2(
 				return model.yellowRack;
 		}
 	});
+var _user$project$Model$sizesMatch = F2(
+	function (_p9, _p8) {
+		var _p10 = _p9;
+		var _p11 = _p8;
+		return _elm_lang$core$Native_Utils.eq(_p10._1, _p11._1);
+	});
+var _user$project$Model$rackIndexPossibilities = _elm_lang$core$Native_List.range(0, 2);
 var _user$project$Model$getRackSection = F2(
 	function (index, rack) {
-		var _p1 = index;
-		switch (_p1) {
+		var _p12 = index;
+		switch (_p12) {
 			case 0:
 				return rack.first;
 			case 1:
@@ -13796,8 +14519,8 @@ var _user$project$Model$getRackSection = F2(
 	});
 var _user$project$Model$setSectionValue = F3(
 	function (size, thing, section) {
-		var _p2 = size;
-		switch (_p2.ctor) {
+		var _p13 = size;
+		switch (_p13.ctor) {
 			case 'Large':
 				return _elm_lang$core$Native_Utils.update(
 					section,
@@ -13812,10 +14535,66 @@ var _user$project$Model$setSectionValue = F3(
 					{small: thing});
 		}
 	});
+var _user$project$Model$setRackSection = F3(
+	function (_p14, newValue, rack) {
+		var _p15 = _p14;
+		var _p17 = _p15._1;
+		var _p16 = _p15._0;
+		switch (_p16) {
+			case 0:
+				return _elm_lang$core$Native_Utils.update(
+					rack,
+					{
+						first: A3(_user$project$Model$setSectionValue, _p17, newValue, rack.first)
+					});
+			case 1:
+				return _elm_lang$core$Native_Utils.update(
+					rack,
+					{
+						second: A3(_user$project$Model$setSectionValue, _p17, newValue, rack.second)
+					});
+			default:
+				return _elm_lang$core$Native_Utils.update(
+					rack,
+					{
+						third: A3(_user$project$Model$setSectionValue, _p17, newValue, rack.third)
+					});
+		}
+	});
+var _user$project$Model$setRackSectionValue = F4(
+	function (pieceColour, rackId, newValue, model) {
+		var _p18 = pieceColour;
+		switch (_p18.ctor) {
+			case 'Red':
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						redRack: A3(_user$project$Model$setRackSection, rackId, newValue, model.redRack)
+					});
+			case 'Green':
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						greenRack: A3(_user$project$Model$setRackSection, rackId, newValue, model.greenRack)
+					});
+			case 'Blue':
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						blueRack: A3(_user$project$Model$setRackSection, rackId, newValue, model.blueRack)
+					});
+			default:
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						yellowRack: A3(_user$project$Model$setRackSection, rackId, newValue, model.yellowRack)
+					});
+		}
+	});
 var _user$project$Model$getSectionValue = F2(
 	function (size, section) {
-		var _p3 = size;
-		switch (_p3.ctor) {
+		var _p19 = size;
+		switch (_p19.ctor) {
 			case 'Large':
 				return section.large;
 			case 'Medium':
@@ -13825,20 +14604,20 @@ var _user$project$Model$getSectionValue = F2(
 		}
 	});
 var _user$project$Model$getRackSectionValue = F3(
-	function (pieceColour, _p4, model) {
-		var _p5 = _p4;
+	function (pieceColour, _p20, model) {
+		var _p21 = _p20;
 		return A2(
 			_user$project$Model$getSectionValue,
-			_p5._1,
+			_p21._1,
 			A2(
 				_user$project$Model$getRackSection,
-				_p5._0,
+				_p21._0,
 				A2(_user$project$Model$getRackByPieceColour, pieceColour, model)));
 	});
 var _user$project$Model$getBoardSection = F2(
 	function (board, boardLocation) {
-		var _p6 = boardLocation;
-		switch (_p6.ctor) {
+		var _p22 = boardLocation;
+		switch (_p22.ctor) {
 			case 'TopLeft':
 				return board.topLeft;
 			case 'TopMiddle':
@@ -13859,9 +14638,9 @@ var _user$project$Model$getBoardSection = F2(
 				return board.bottomRight;
 		}
 	});
-var _user$project$Model$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {mdl: a, board: b, redRack: c, greenRack: d, blueRack: e, yellowRack: f, selected: g};
+var _user$project$Model$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {mdl: a, board: b, redRack: c, greenRack: d, blueRack: e, yellowRack: f, selected: g, players: h, muted: i};
 	});
 var _user$project$Model$Board = F9(
 	function (a, b, c, d, e, f, g, h, i) {
@@ -13892,36 +14671,85 @@ var _user$project$Model$LeftMiddle = {ctor: 'LeftMiddle'};
 var _user$project$Model$TopRight = {ctor: 'TopRight'};
 var _user$project$Model$TopMiddle = {ctor: 'TopMiddle'};
 var _user$project$Model$TopLeft = {ctor: 'TopLeft'};
+var _user$project$Model$boardLocationPossibilities = _elm_lang$core$Native_List.fromArray(
+	[_user$project$Model$TopLeft, _user$project$Model$TopMiddle, _user$project$Model$TopRight, _user$project$Model$LeftMiddle, _user$project$Model$Middle, _user$project$Model$RightMiddle, _user$project$Model$BottomLeft, _user$project$Model$BottomMiddle, _user$project$Model$BottomRight]);
+var _user$project$Model$getBoardSections = function (board) {
+	return A2(
+		_elm_lang$core$List$map,
+		_user$project$Model$getBoardSection(board),
+		_user$project$Model$boardLocationPossibilities);
+};
+var _user$project$Model$lineLocations = _elm_lang$core$Native_List.fromArray(
+	[
+		_elm_lang$core$Native_List.fromArray(
+		[_user$project$Model$TopLeft, _user$project$Model$TopMiddle, _user$project$Model$TopRight]),
+		_elm_lang$core$Native_List.fromArray(
+		[_user$project$Model$LeftMiddle, _user$project$Model$Middle, _user$project$Model$RightMiddle]),
+		_elm_lang$core$Native_List.fromArray(
+		[_user$project$Model$BottomLeft, _user$project$Model$BottomMiddle, _user$project$Model$BottomRight]),
+		_elm_lang$core$Native_List.fromArray(
+		[_user$project$Model$TopLeft, _user$project$Model$LeftMiddle, _user$project$Model$BottomLeft]),
+		_elm_lang$core$Native_List.fromArray(
+		[_user$project$Model$TopMiddle, _user$project$Model$Middle, _user$project$Model$BottomMiddle]),
+		_elm_lang$core$Native_List.fromArray(
+		[_user$project$Model$TopRight, _user$project$Model$RightMiddle, _user$project$Model$BottomRight]),
+		_elm_lang$core$Native_List.fromArray(
+		[_user$project$Model$TopLeft, _user$project$Model$Middle, _user$project$Model$BottomRight]),
+		_elm_lang$core$Native_List.fromArray(
+		[_user$project$Model$TopRight, _user$project$Model$Middle, _user$project$Model$BottomLeft])
+	]);
+var _user$project$Model$getLines = function (board) {
+	return A2(
+		_elm_lang$core$List$map,
+		_elm_lang$core$List$map(
+			_user$project$Model$getBoardSection(board)),
+		_user$project$Model$lineLocations);
+};
 var _user$project$Model$Empty = {ctor: 'Empty'};
 var _user$project$Model$emptySection = A3(_user$project$Model$Section, _user$project$Model$Empty, _user$project$Model$Empty, _user$project$Model$Empty);
 var _user$project$Model$emptyBoard = A9(_user$project$Model$Board, _user$project$Model$emptySection, _user$project$Model$emptySection, _user$project$Model$emptySection, _user$project$Model$emptySection, _user$project$Model$emptySection, _user$project$Model$emptySection, _user$project$Model$emptySection, _user$project$Model$emptySection, _user$project$Model$emptySection);
-var _user$project$Model$defaultState = {mdl: _debois$elm_mdl$Material$model, board: _user$project$Model$emptyBoard, redRack: _user$project$Model$fullRack, greenRack: _user$project$Model$fullRack, blueRack: _user$project$Model$fullRack, yellowRack: _user$project$Model$fullRack, selected: _elm_lang$core$Maybe$Nothing};
+var _user$project$Model$defaultState = {mdl: _debois$elm_mdl$Material$model, board: _user$project$Model$emptyBoard, redRack: _user$project$Model$fullRack, greenRack: _user$project$Model$fullRack, blueRack: _user$project$Model$fullRack, yellowRack: _user$project$Model$fullRack, selected: _elm_lang$core$Maybe$Nothing, players: 3, muted: false};
 var _user$project$Model$isFree = F2(
-	function (board, _p7) {
-		var _p8 = _p7;
+	function (board, _p23) {
+		var _p24 = _p23;
 		return _elm_lang$core$Native_Utils.eq(
 			A2(
 				_user$project$Model$getSectionValue,
-				_p8._1,
-				A2(_user$project$Model$getBoardSection, board, _p8._0)),
+				_p24._1,
+				A2(_user$project$Model$getBoardSection, board, _p24._0)),
 			_user$project$Model$Empty);
+	});
+var _user$project$Model$getAllEmptySpacesOfSize = F2(
+	function (board, size) {
+		return A2(
+			_elm_lang$core$List$filterMap,
+			function (location) {
+				var boardId = A2(_user$project$Model$BoardId, location, size);
+				var _p25 = A2(_user$project$Model$isFree, board, boardId);
+				if (_p25 === true) {
+					return _elm_lang$core$Maybe$Just(boardId);
+				} else {
+					return _elm_lang$core$Maybe$Nothing;
+				}
+			},
+			_user$project$Model$boardLocationPossibilities);
 	});
 var _user$project$Model$PieceType = function (a) {
 	return {ctor: 'PieceType', _0: a};
 };
 var _user$project$Model$setBoardSectionValue = F3(
-	function (pieceColour, _p9, board) {
-		var _p10 = _p9;
-		var _p12 = _p10._1;
-		var _p11 = _p10._0;
-		switch (_p11.ctor) {
+	function (pieceColour, _p26, board) {
+		var _p27 = _p26;
+		var _p29 = _p27._1;
+		var _p28 = _p27._0;
+		switch (_p28.ctor) {
 			case 'TopLeft':
 				return _elm_lang$core$Native_Utils.update(
 					board,
 					{
 						topLeft: A3(
 							_user$project$Model$setSectionValue,
-							_p12,
+							_p29,
 							_user$project$Model$PieceType(pieceColour),
 							board.topLeft)
 					});
@@ -13931,7 +14759,7 @@ var _user$project$Model$setBoardSectionValue = F3(
 					{
 						topMiddle: A3(
 							_user$project$Model$setSectionValue,
-							_p12,
+							_p29,
 							_user$project$Model$PieceType(pieceColour),
 							board.topMiddle)
 					});
@@ -13941,7 +14769,7 @@ var _user$project$Model$setBoardSectionValue = F3(
 					{
 						topRight: A3(
 							_user$project$Model$setSectionValue,
-							_p12,
+							_p29,
 							_user$project$Model$PieceType(pieceColour),
 							board.topRight)
 					});
@@ -13951,7 +14779,7 @@ var _user$project$Model$setBoardSectionValue = F3(
 					{
 						leftMiddle: A3(
 							_user$project$Model$setSectionValue,
-							_p12,
+							_p29,
 							_user$project$Model$PieceType(pieceColour),
 							board.leftMiddle)
 					});
@@ -13961,7 +14789,7 @@ var _user$project$Model$setBoardSectionValue = F3(
 					{
 						middle: A3(
 							_user$project$Model$setSectionValue,
-							_p12,
+							_p29,
 							_user$project$Model$PieceType(pieceColour),
 							board.middle)
 					});
@@ -13971,7 +14799,7 @@ var _user$project$Model$setBoardSectionValue = F3(
 					{
 						rightMiddle: A3(
 							_user$project$Model$setSectionValue,
-							_p12,
+							_p29,
 							_user$project$Model$PieceType(pieceColour),
 							board.rightMiddle)
 					});
@@ -13981,7 +14809,7 @@ var _user$project$Model$setBoardSectionValue = F3(
 					{
 						bottomLeft: A3(
 							_user$project$Model$setSectionValue,
-							_p12,
+							_p29,
 							_user$project$Model$PieceType(pieceColour),
 							board.bottomLeft)
 					});
@@ -13991,7 +14819,7 @@ var _user$project$Model$setBoardSectionValue = F3(
 					{
 						bottomMiddle: A3(
 							_user$project$Model$setSectionValue,
-							_p12,
+							_p29,
 							_user$project$Model$PieceType(pieceColour),
 							board.bottomMiddle)
 					});
@@ -14001,7 +14829,7 @@ var _user$project$Model$setBoardSectionValue = F3(
 					{
 						bottomRight: A3(
 							_user$project$Model$setSectionValue,
-							_p12,
+							_p29,
 							_user$project$Model$PieceType(pieceColour),
 							board.bottomRight)
 					});
@@ -14009,16 +14837,47 @@ var _user$project$Model$setBoardSectionValue = F3(
 	});
 var _user$project$Model$placeAt = F4(
 	function (pieceColour, rackId, boardId, model) {
-		return A3(_user$project$Model$getRackSectionValue, pieceColour, rackId, model) ? _elm_lang$core$Native_Utils.update(
-			model,
-			{
-				board: A3(_user$project$Model$setBoardSectionValue, pieceColour, boardId, model.board)
-			}) : model;
+		if (A2(_user$project$Model$sizesMatch, rackId, boardId) && A3(_user$project$Model$getRackSectionValue, pieceColour, rackId, model)) {
+			var postRackSetModel = A4(_user$project$Model$setRackSectionValue, pieceColour, rackId, false, model);
+			return _elm_lang$core$Maybe$Just(
+				_elm_lang$core$Native_Utils.update(
+					postRackSetModel,
+					{
+						board: A3(_user$project$Model$setBoardSectionValue, pieceColour, boardId, postRackSetModel.board)
+					}));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _user$project$Model$hasMatchOfGivenColour = F2(
+	function (board, pieceColour) {
+		var boardState = _user$project$Model$PieceType(pieceColour);
+		return A2(
+			_elm_lang$core$List$any,
+			_user$project$Model$completeSection(boardState),
+			_user$project$Model$getBoardSections(board)) || function () {
+			var lines = _user$project$Model$getLines(board);
+			return A2(
+				_elm_lang$core$List$any,
+				_user$project$Model$matchingLine(boardState),
+				lines) || A2(
+				_elm_lang$core$List$any,
+				_user$project$Model$oneOfEachLine(boardState),
+				lines);
+		}();
 	});
 var _user$project$Model$Yellow = {ctor: 'Yellow'};
 var _user$project$Model$Blue = {ctor: 'Blue'};
 var _user$project$Model$Green = {ctor: 'Green'};
 var _user$project$Model$Red = {ctor: 'Red'};
+var _user$project$Model$pieceColourPossibilities = _elm_lang$core$Native_List.fromArray(
+	[_user$project$Model$Red, _user$project$Model$Green, _user$project$Model$Blue, _user$project$Model$Yellow]);
+var _user$project$Model$getWinner = function (board) {
+	return A2(
+		_user$project$Extras$find,
+		_user$project$Model$hasMatchOfGivenColour(board),
+		_user$project$Model$pieceColourPossibilities);
+};
 var _user$project$Model$RackId = F2(
 	function (a, b) {
 		return {ctor: 'RackId', _0: a, _1: b};
@@ -14026,8 +14885,47 @@ var _user$project$Model$RackId = F2(
 var _user$project$Model$Small = {ctor: 'Small'};
 var _user$project$Model$Medium = {ctor: 'Medium'};
 var _user$project$Model$Large = {ctor: 'Large'};
+var _user$project$Model$sizePossibilities = _elm_lang$core$Native_List.fromArray(
+	[_user$project$Model$Large, _user$project$Model$Medium, _user$project$Model$Small]);
+var _user$project$Model$boardIdPossibilities = A2(
+	_elm_lang$core$List$concatMap,
+	function (location) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Model$BoardId(location),
+			_user$project$Model$sizePossibilities);
+	},
+	_user$project$Model$boardLocationPossibilities);
+var _user$project$Model$getBlockingBoardIdsForColour = F2(
+	function (board, pieceColour) {
+		return A2(
+			_elm_lang$core$List$filter,
+			function (boardId) {
+				var _p30 = _user$project$Model$getWinner(
+					A3(_user$project$Model$setBoardSectionValue, pieceColour, boardId, board));
+				if (_p30.ctor === 'Just') {
+					return true;
+				} else {
+					return false;
+				}
+			},
+			_user$project$Model$boardIdPossibilities);
+	});
+var _user$project$Model$rackIdPossibilities = A2(
+	_elm_lang$core$List$concatMap,
+	function (index) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Model$RackId(index),
+			_user$project$Model$sizePossibilities);
+	},
+	_user$project$Model$rackIndexPossibilities);
 
 var _user$project$Msg$NoOp = {ctor: 'NoOp'};
+var _user$project$Msg$ToggleMute = {ctor: 'ToggleMute'};
+var _user$project$Msg$NewGame = function (a) {
+	return {ctor: 'NewGame', _0: a};
+};
 var _user$project$Msg$Place = function (a) {
 	return {ctor: 'Place', _0: a};
 };
@@ -14120,6 +15018,21 @@ var _user$project$View$noHighlight = _elm_lang$core$Native_List.fromArray(
 	[
 		_elm_lang$svg$Svg_Attributes$stroke('grey')
 	]);
+var _user$project$View$getBoardStroke = F2(
+	function (highlightSize, selectedSize) {
+		return _elm_lang$core$Native_Utils.eq(
+			selectedSize,
+			_elm_lang$core$Maybe$Just(highlightSize)) ? _elm_lang$svg$Svg_Attributes$stroke('white') : _elm_lang$svg$Svg_Attributes$stroke('grey');
+	});
+var _user$project$View$getSelectedSize = function (model) {
+	return A2(
+		_elm_lang$core$Maybe$map,
+		function (_p0) {
+			var _p1 = _p0;
+			return _p1._1;
+		},
+		model.selected);
+};
 var _user$project$View$gameHeight = 600;
 var _user$project$View$heightString = _elm_lang$core$Basics$toString(_user$project$View$gameHeight);
 var _user$project$View$sectionHeight = _user$project$View$gameHeight / 5;
@@ -14141,9 +15054,9 @@ var _user$project$View$halfSectionWidth = _user$project$View$sectionWidth / 2;
 var _user$project$View$halfSectionWidthString = _elm_lang$core$Basics$toString(_user$project$View$halfSectionWidth);
 var _user$project$View$largeRing = A4(_user$project$View$donut, _user$project$View$halfSectionWidth + 0.5, _user$project$View$halfSectionHeight + 0.5, _user$project$View$halfSectionWidth - 1.5, (_user$project$View$halfSectionWidth * 7) / 9);
 var _user$project$View$mediumRing = A4(_user$project$View$donut, _user$project$View$halfSectionWidth + 0.5, _user$project$View$halfSectionHeight + 0.5, ((_user$project$View$halfSectionWidth * 5) / 9) - 1.5, (_user$project$View$halfSectionWidth * 3) / 9);
-var _user$project$View$boardSectionView = F2(
-	function (location, _p0) {
-		var _p1 = _p0;
+var _user$project$View$boardSectionView = F3(
+	function (selectedSize, location, _p2) {
+		var _p3 = _p2;
 		return A2(
 			_elm_lang$svg$Svg$svg,
 			_elm_lang$core$Native_List.fromArray(
@@ -14155,13 +15068,13 @@ var _user$project$View$boardSectionView = F2(
 			_elm_lang$core$Native_List.fromArray(
 				[
 					function () {
-					var _p2 = _p1._0;
-					if (_p2.ctor === 'Colour') {
+					var _p4 = _p3._0;
+					if (_p4.ctor === 'Colour') {
 						return _user$project$View$piecePath(
 							_elm_lang$core$Native_List.fromArray(
 								[
 									_elm_lang$svg$Svg_Attributes$stroke('grey'),
-									_elm_lang$svg$Svg_Attributes$fill(_p2._0),
+									_elm_lang$svg$Svg_Attributes$fill(_p4._0),
 									_elm_lang$svg$Svg_Attributes$d(_user$project$View$largeRing)
 								]));
 					} else {
@@ -14173,18 +15086,18 @@ var _user$project$View$boardSectionView = F2(
 										A2(_user$project$Model$BoardId, location, _user$project$Model$Large))),
 									_elm_lang$svg$Svg_Attributes$fillOpacity('0.1'),
 									_elm_lang$svg$Svg_Attributes$d(_user$project$View$largeRing),
-									_elm_lang$svg$Svg_Attributes$stroke('grey')
+									A2(_user$project$View$getBoardStroke, _user$project$Model$Large, selectedSize)
 								]));
 					}
 				}(),
 					function () {
-					var _p3 = _p1._1;
-					if (_p3.ctor === 'Colour') {
+					var _p5 = _p3._1;
+					if (_p5.ctor === 'Colour') {
 						return _user$project$View$piecePath(
 							_elm_lang$core$Native_List.fromArray(
 								[
 									_elm_lang$svg$Svg_Attributes$stroke('grey'),
-									_elm_lang$svg$Svg_Attributes$fill(_p3._0),
+									_elm_lang$svg$Svg_Attributes$fill(_p5._0),
 									_elm_lang$svg$Svg_Attributes$d(_user$project$View$mediumRing)
 								]));
 					} else {
@@ -14196,13 +15109,13 @@ var _user$project$View$boardSectionView = F2(
 										A2(_user$project$Model$BoardId, location, _user$project$Model$Medium))),
 									_elm_lang$svg$Svg_Attributes$fillOpacity('0.1'),
 									_elm_lang$svg$Svg_Attributes$d(_user$project$View$mediumRing),
-									_elm_lang$svg$Svg_Attributes$stroke('grey')
+									A2(_user$project$View$getBoardStroke, _user$project$Model$Medium, selectedSize)
 								]));
 					}
 				}(),
 					function () {
-					var _p4 = _p1._2;
-					if (_p4.ctor === 'Colour') {
+					var _p6 = _p3._2;
+					if (_p6.ctor === 'Colour') {
 						return A2(
 							_elm_lang$svg$Svg$circle,
 							_elm_lang$core$Native_List.fromArray(
@@ -14212,7 +15125,7 @@ var _user$project$View$boardSectionView = F2(
 									_elm_lang$svg$Svg_Attributes$r(
 									_elm_lang$core$Basics$toString((_user$project$View$halfSectionWidth * 1) / 9)),
 									_elm_lang$svg$Svg_Attributes$stroke('grey'),
-									_elm_lang$svg$Svg_Attributes$fill(_p4._0)
+									_elm_lang$svg$Svg_Attributes$fill(_p6._0)
 								]),
 							_elm_lang$core$Native_List.fromArray(
 								[]));
@@ -14225,11 +15138,11 @@ var _user$project$View$boardSectionView = F2(
 									_elm_lang$svg$Svg_Attributes$cy(_user$project$View$halfSectionWidthString),
 									_elm_lang$svg$Svg_Attributes$r(
 									_elm_lang$core$Basics$toString((_user$project$View$halfSectionWidth * 1) / 9)),
-									_elm_lang$svg$Svg_Attributes$stroke('grey'),
 									_elm_lang$svg$Svg_Events$onClick(
 									_user$project$Msg$Place(
 										A2(_user$project$Model$BoardId, location, _user$project$Model$Small))),
-									_elm_lang$svg$Svg_Attributes$fillOpacity('0.1')
+									_elm_lang$svg$Svg_Attributes$fillOpacity('0.1'),
+									A2(_user$project$View$getBoardStroke, _user$project$Model$Small, selectedSize)
 								]),
 							_elm_lang$core$Native_List.fromArray(
 								[]));
@@ -14238,8 +15151,8 @@ var _user$project$View$boardSectionView = F2(
 				]));
 	});
 var _user$project$View$playerRackSectionViewHelper = F5(
-	function (largeAttributes, mediumAttributes, smallAttributes, index, _p5) {
-		var _p6 = _p5;
+	function (largeAttributes, mediumAttributes, smallAttributes, index, _p7) {
+		var _p8 = _p7;
 		return A2(
 			_elm_lang$svg$Svg$svg,
 			_elm_lang$core$Native_List.fromArray(
@@ -14251,8 +15164,8 @@ var _user$project$View$playerRackSectionViewHelper = F5(
 			_elm_lang$core$Native_List.fromArray(
 				[
 					function () {
-					var _p7 = _p6._0;
-					if (_p7.ctor === 'Colour') {
+					var _p9 = _p8._0;
+					if (_p9.ctor === 'Colour') {
 						return _user$project$View$piecePath(
 							A2(
 								_elm_lang$core$Basics_ops['++'],
@@ -14261,7 +15174,7 @@ var _user$project$View$playerRackSectionViewHelper = F5(
 										_elm_lang$svg$Svg_Events$onClick(
 										_user$project$Msg$Select(
 											A2(_user$project$Model$RackId, index, _user$project$Model$Large))),
-										_elm_lang$svg$Svg_Attributes$fill(_p7._0),
+										_elm_lang$svg$Svg_Attributes$fill(_p9._0),
 										_elm_lang$svg$Svg_Attributes$d(_user$project$View$largeRing)
 									]),
 								largeAttributes));
@@ -14270,8 +15183,8 @@ var _user$project$View$playerRackSectionViewHelper = F5(
 					}
 				}(),
 					function () {
-					var _p8 = _p6._1;
-					if (_p8.ctor === 'Colour') {
+					var _p10 = _p8._1;
+					if (_p10.ctor === 'Colour') {
 						return _user$project$View$piecePath(
 							A2(
 								_elm_lang$core$Basics_ops['++'],
@@ -14280,7 +15193,7 @@ var _user$project$View$playerRackSectionViewHelper = F5(
 										_elm_lang$svg$Svg_Events$onClick(
 										_user$project$Msg$Select(
 											A2(_user$project$Model$RackId, index, _user$project$Model$Medium))),
-										_elm_lang$svg$Svg_Attributes$fill(_p8._0),
+										_elm_lang$svg$Svg_Attributes$fill(_p10._0),
 										_elm_lang$svg$Svg_Attributes$d(_user$project$View$mediumRing)
 									]),
 								mediumAttributes));
@@ -14289,8 +15202,8 @@ var _user$project$View$playerRackSectionViewHelper = F5(
 					}
 				}(),
 					function () {
-					var _p9 = _p6._2;
-					if (_p9.ctor === 'Colour') {
+					var _p11 = _p8._2;
+					if (_p11.ctor === 'Colour') {
 						return _user$project$View$pieceCircle(
 							A2(
 								_elm_lang$core$Basics_ops['++'],
@@ -14304,7 +15217,7 @@ var _user$project$View$playerRackSectionViewHelper = F5(
 										_elm_lang$svg$Svg_Attributes$r(
 										_elm_lang$core$Basics$toString((_user$project$View$halfSectionWidth * 1) / 9)),
 										_elm_lang$svg$Svg_Attributes$stroke('grey'),
-										_elm_lang$svg$Svg_Attributes$fill(_p9._0)
+										_elm_lang$svg$Svg_Attributes$fill(_p11._0)
 									]),
 								smallAttributes));
 					} else {
@@ -14317,13 +15230,13 @@ var _user$project$View$rackSectionView = A3(_user$project$View$playerRackSection
 var _user$project$View$playerRackSectionView = F3(
 	function (maybeRackId, index, ringDescription) {
 		var curriedHelper = function () {
-			var _p10 = maybeRackId;
-			if (_p10.ctor === 'Nothing') {
+			var _p12 = maybeRackId;
+			if (_p12.ctor === 'Nothing') {
 				return A3(_user$project$View$playerRackSectionViewHelper, _user$project$View$noHighlight, _user$project$View$noHighlight, _user$project$View$noHighlight);
 			} else {
-				if (_elm_lang$core$Native_Utils.eq(index, _p10._0._0)) {
-					var _p11 = _p10._0._1;
-					switch (_p11.ctor) {
+				if (_elm_lang$core$Native_Utils.eq(index, _p12._0._0)) {
+					var _p13 = _p12._0._1;
+					switch (_p13.ctor) {
 						case 'Large':
 							return A3(_user$project$View$playerRackSectionViewHelper, _user$project$View$highlight, _user$project$View$noHighlight, _user$project$View$noHighlight);
 						case 'Medium':
@@ -14351,9 +15264,9 @@ var _user$project$View$descriptionFromRack = F2(
 		return b ? _user$project$View$Colour(colour) : _user$project$View$Blank;
 	});
 var _user$project$View$descriptionFromBoardState = function (boardState) {
-	var _p12 = boardState;
-	if (_p12.ctor === 'PieceType') {
-		switch (_p12._0.ctor) {
+	var _p14 = boardState;
+	if (_p14.ctor === 'PieceType') {
+		switch (_p14._0.ctor) {
 			case 'Red':
 				return _user$project$View$Colour(_user$project$View$red);
 			case 'Green':
@@ -14395,100 +15308,110 @@ var _user$project$View$boardSectionDescription = function (section) {
 		_user$project$View$descriptionFromBoardState(section.medium),
 		_user$project$View$descriptionFromBoardState(section.small));
 };
-var _user$project$View$boardView = function (board) {
-	return A2(
-		_elm_lang$html$Html$div,
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$style(
-				_elm_lang$core$Native_List.fromArray(
-					[
-						{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
-						{ctor: '_Tuple2', _0: 'flex-direction', _1: 'column'}
-					]))
-			]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$style(
-						_elm_lang$core$Native_List.fromArray(
-							[
-								{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
-								{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
-							]))
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_user$project$View$boardSectionView,
-						_user$project$Model$TopLeft,
-						_user$project$View$boardSectionDescription(board.topLeft)),
-						A2(
-						_user$project$View$boardSectionView,
-						_user$project$Model$TopMiddle,
-						_user$project$View$boardSectionDescription(board.topMiddle)),
-						A2(
-						_user$project$View$boardSectionView,
-						_user$project$Model$TopRight,
-						_user$project$View$boardSectionDescription(board.topRight))
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$style(
-						_elm_lang$core$Native_List.fromArray(
-							[
-								{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
-								{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
-							]))
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_user$project$View$boardSectionView,
-						_user$project$Model$LeftMiddle,
-						_user$project$View$boardSectionDescription(board.leftMiddle)),
-						A2(
-						_user$project$View$boardSectionView,
-						_user$project$Model$Middle,
-						_user$project$View$boardSectionDescription(board.middle)),
-						A2(
-						_user$project$View$boardSectionView,
-						_user$project$Model$RightMiddle,
-						_user$project$View$boardSectionDescription(board.rightMiddle))
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$style(
-						_elm_lang$core$Native_List.fromArray(
-							[
-								{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
-								{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
-							]))
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_user$project$View$boardSectionView,
-						_user$project$Model$BottomLeft,
-						_user$project$View$boardSectionDescription(board.bottomLeft)),
-						A2(
-						_user$project$View$boardSectionView,
-						_user$project$Model$BottomMiddle,
-						_user$project$View$boardSectionDescription(board.bottomMiddle)),
-						A2(
-						_user$project$View$boardSectionView,
-						_user$project$Model$BottomRight,
-						_user$project$View$boardSectionDescription(board.bottomRight))
-					]))
-			]));
-};
+var _user$project$View$boardView = F2(
+	function (selectedSize, board) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$style(
+					_elm_lang$core$Native_List.fromArray(
+						[
+							{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+							{ctor: '_Tuple2', _0: 'flex-direction', _1: 'column'}
+						]))
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+									{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
+								]))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A3(
+							_user$project$View$boardSectionView,
+							selectedSize,
+							_user$project$Model$TopLeft,
+							_user$project$View$boardSectionDescription(board.topLeft)),
+							A3(
+							_user$project$View$boardSectionView,
+							selectedSize,
+							_user$project$Model$TopMiddle,
+							_user$project$View$boardSectionDescription(board.topMiddle)),
+							A3(
+							_user$project$View$boardSectionView,
+							selectedSize,
+							_user$project$Model$TopRight,
+							_user$project$View$boardSectionDescription(board.topRight))
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+									{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
+								]))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A3(
+							_user$project$View$boardSectionView,
+							selectedSize,
+							_user$project$Model$LeftMiddle,
+							_user$project$View$boardSectionDescription(board.leftMiddle)),
+							A3(
+							_user$project$View$boardSectionView,
+							selectedSize,
+							_user$project$Model$Middle,
+							_user$project$View$boardSectionDescription(board.middle)),
+							A3(
+							_user$project$View$boardSectionView,
+							selectedSize,
+							_user$project$Model$RightMiddle,
+							_user$project$View$boardSectionDescription(board.rightMiddle))
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+									{ctor: '_Tuple2', _0: 'flex-direction', _1: 'row'}
+								]))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A3(
+							_user$project$View$boardSectionView,
+							selectedSize,
+							_user$project$Model$BottomLeft,
+							_user$project$View$boardSectionDescription(board.bottomLeft)),
+							A3(
+							_user$project$View$boardSectionView,
+							selectedSize,
+							_user$project$Model$BottomMiddle,
+							_user$project$View$boardSectionDescription(board.bottomMiddle)),
+							A3(
+							_user$project$View$boardSectionView,
+							selectedSize,
+							_user$project$Model$BottomRight,
+							_user$project$View$boardSectionDescription(board.bottomRight))
+						]))
+				]));
+	});
 var _user$project$View$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -14517,25 +15440,87 @@ var _user$project$View$view = function (model) {
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						A5(
-						_debois$elm_mdl$Material_Button$render,
-						_user$project$Msg$Mdl,
-						_elm_lang$core$Native_List.fromArray(
-							[0]),
-						model.mdl,
+						A2(
+						_elm_lang$html$Html$div,
 						_elm_lang$core$Native_List.fromArray(
 							[
-								_debois$elm_mdl$Material_Button$raised,
-								_debois$elm_mdl$Material_Button$ripple,
-								_debois$elm_mdl$Material_Button$onClick(_user$project$Msg$NoOp),
-								A2(
-								_debois$elm_mdl$Material_Options$css,
-								'width',
-								A2(_elm_lang$core$Basics_ops['++'], _user$project$View$sectionWidthString, 'px'))
+								_elm_lang$html$Html_Attributes$style(
+								_elm_lang$core$Native_List.fromArray(
+									[
+										{ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+										{ctor: '_Tuple2', _0: 'flex-direction', _1: 'column'},
+										{ctor: '_Tuple2', _0: 'align-items', _1: 'center'}
+									]))
 							]),
 						_elm_lang$core$Native_List.fromArray(
 							[
-								_elm_lang$html$Html$text('New Game')
+								_elm_lang$html$Html$text('New game'),
+								A5(
+								_debois$elm_mdl$Material_Button$render,
+								_user$project$Msg$Mdl,
+								_elm_lang$core$Native_List.fromArray(
+									[2]),
+								model.mdl,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_debois$elm_mdl$Material_Button$raised,
+										_debois$elm_mdl$Material_Button$ripple,
+										_debois$elm_mdl$Material_Button$onClick(
+										_user$project$Msg$NewGame(2)),
+										A2(
+										_debois$elm_mdl$Material_Options$css,
+										'width',
+										A2(_elm_lang$core$Basics_ops['++'], _user$project$View$sectionWidthString, 'px'))
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_debois$elm_mdl$Material_Icon$i('memory')
+									])),
+								A5(
+								_debois$elm_mdl$Material_Button$render,
+								_user$project$Msg$Mdl,
+								_elm_lang$core$Native_List.fromArray(
+									[3]),
+								model.mdl,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_debois$elm_mdl$Material_Button$raised,
+										_debois$elm_mdl$Material_Button$ripple,
+										_debois$elm_mdl$Material_Button$onClick(
+										_user$project$Msg$NewGame(3)),
+										A2(
+										_debois$elm_mdl$Material_Options$css,
+										'width',
+										A2(_elm_lang$core$Basics_ops['++'], _user$project$View$sectionWidthString, 'px'))
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_debois$elm_mdl$Material_Icon$i('memory'),
+										_debois$elm_mdl$Material_Icon$i('memory')
+									])),
+								A5(
+								_debois$elm_mdl$Material_Button$render,
+								_user$project$Msg$Mdl,
+								_elm_lang$core$Native_List.fromArray(
+									[4]),
+								model.mdl,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_debois$elm_mdl$Material_Button$raised,
+										_debois$elm_mdl$Material_Button$ripple,
+										_debois$elm_mdl$Material_Button$onClick(
+										_user$project$Msg$NewGame(4)),
+										A2(
+										_debois$elm_mdl$Material_Options$css,
+										'width',
+										A2(_elm_lang$core$Basics_ops['++'], _user$project$View$sectionWidthString, 'px'))
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_debois$elm_mdl$Material_Icon$i('memory'),
+										_debois$elm_mdl$Material_Icon$i('memory'),
+										_debois$elm_mdl$Material_Icon$i('memory')
+									]))
 							])),
 						A2(
 						_elm_lang$html$Html$div,
@@ -14556,13 +15541,13 @@ var _user$project$View$view = function (model) {
 						_debois$elm_mdl$Material_Button$render,
 						_user$project$Msg$Mdl,
 						_elm_lang$core$Native_List.fromArray(
-							[1]),
+							[0]),
 						model.mdl,
 						_elm_lang$core$Native_List.fromArray(
 							[
-								_debois$elm_mdl$Material_Button$raised,
+								_debois$elm_mdl$Material_Button$icon,
 								_debois$elm_mdl$Material_Button$ripple,
-								_debois$elm_mdl$Material_Button$onClick(_user$project$Msg$NoOp),
+								_debois$elm_mdl$Material_Button$onClick(_user$project$Msg$ToggleMute),
 								A2(
 								_debois$elm_mdl$Material_Options$css,
 								'width',
@@ -14570,7 +15555,8 @@ var _user$project$View$view = function (model) {
 							]),
 						_elm_lang$core$Native_List.fromArray(
 							[
-								_elm_lang$html$Html$text('Mute')
+								_debois$elm_mdl$Material_Icon$i(
+								model.muted ? 'volume_mute' : 'volume_up')
 							]))
 					])),
 				A2(
@@ -14601,7 +15587,10 @@ var _user$project$View$view = function (model) {
 							_elm_lang$core$List$indexedMap,
 							_user$project$View$rackSectionView,
 							A2(_user$project$View$rackDescription, _user$project$View$green, model.greenRack))),
-						_user$project$View$boardView(model.board),
+						A2(
+						_user$project$View$boardView,
+						_user$project$View$getSelectedSize(model),
+						model.board),
 						A2(
 						_elm_lang$html$Html$div,
 						_elm_lang$core$Native_List.fromArray(
@@ -14632,7 +15621,22 @@ var _user$project$View$view = function (model) {
 				A2(
 					_elm_lang$core$List$indexedMap,
 					_user$project$View$playerRackSectionView(model.selected),
-					A2(_user$project$View$rackDescription, _user$project$View$blue, model.blueRack)))
+					A2(_user$project$View$rackDescription, _user$project$View$blue, model.blueRack))),
+				function () {
+				var _p15 = _user$project$Model$getWinner(
+					function (_) {
+						return _.board;
+					}(model));
+				if (_p15.ctor === 'Just') {
+					return _elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(_p15._0),
+							' wins'));
+				} else {
+					return _elm_lang$html$Html$text('');
+				}
+			}()
 			]));
 };
 
@@ -14642,38 +15646,244 @@ var _user$project$Ports$sound = _elm_lang$core$Native_Platform.outgoingPort(
 		return v;
 	});
 
+var _user$project$Update$getAvailableMovesForRackId = F2(
+	function (board, rackId) {
+		var _p0 = rackId;
+		var size = _p0._1;
+		return A2(
+			_elm_lang$core$List$map,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				})(rackId),
+			A2(_user$project$Model$getAllEmptySpacesOfSize, board, size));
+	});
+var _user$project$Update$isSmall = function (_p1) {
+	var _p2 = _p1;
+	return _elm_lang$core$Native_Utils.eq(_p2._1, _user$project$Model$Small);
+};
+var _user$project$Update$isMedium = function (_p3) {
+	var _p4 = _p3;
+	return _elm_lang$core$Native_Utils.eq(_p4._1, _user$project$Model$Medium);
+};
+var _user$project$Update$isLarge = function (_p5) {
+	var _p6 = _p5;
+	return _elm_lang$core$Native_Utils.eq(_p6._1, _user$project$Model$Large);
+};
+var _user$project$Update$atMostOneOfEachSize = function (rackIds) {
+	return A2(
+		_elm_lang$core$List$filterMap,
+		_elm_lang$core$Basics$identity,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(_user$project$Extras$find, _user$project$Update$isLarge, rackIds),
+				A2(_user$project$Extras$find, _user$project$Update$isMedium, rackIds),
+				A2(_user$project$Extras$find, _user$project$Update$isSmall, rackIds)
+			]));
+};
+var _user$project$Update$getAvailableRackIds = F2(
+	function (pieceColour, model) {
+		var rack = A2(_user$project$Model$getRackByPieceColour, pieceColour, model);
+		return A2(
+			_elm_lang$core$List$filterMap,
+			function (rackId) {
+				return A3(_user$project$Model$getRackSectionValue, pieceColour, rackId, model) ? _elm_lang$core$Maybe$Just(rackId) : _elm_lang$core$Maybe$Nothing;
+			},
+			_user$project$Model$rackIdPossibilities);
+	});
+var _user$project$Update$getAvailableMoves = F2(
+	function (pieceColour, model) {
+		return A2(
+			_elm_lang$core$List$concatMap,
+			_user$project$Update$getAvailableMovesForRackId(model.board),
+			_user$project$Update$atMostOneOfEachSize(
+				A2(_user$project$Update$getAvailableRackIds, pieceColour, model)));
+	});
+var _user$project$Update$shuffle = F2(
+	function (seed, list) {
+		var length = _elm_lang$core$List$length(list);
+		var randomTags = _elm_lang$core$Basics$fst(
+			A2(
+				_mgold$elm_random_pcg$Random_Pcg$step,
+				A2(
+					_mgold$elm_random_pcg$Random_Pcg$list,
+					length,
+					A2(_mgold$elm_random_pcg$Random_Pcg$int, 0, length)),
+				_mgold$elm_random_pcg$Random_Pcg$initialSeed(42)));
+		return _elm_lang$core$Basics$snd(
+			_elm_lang$core$List$unzip(
+				A2(
+					_elm_lang$core$List$sortBy,
+					_elm_lang$core$Basics$fst,
+					A3(
+						_elm_lang$core$List$map2,
+						F2(
+							function (v0, v1) {
+								return {ctor: '_Tuple2', _0: v0, _1: v1};
+							}),
+						randomTags,
+						list))));
+	});
+var _user$project$Update$otherColours = function (pieceColour) {
+	return A2(
+		_elm_lang$core$List$filter,
+		F2(
+			function (x, y) {
+				return !_elm_lang$core$Native_Utils.eq(x, y);
+			})(pieceColour),
+		_user$project$Model$pieceColourPossibilities);
+};
+var _user$project$Update$getBlockingBoardIds = F2(
+	function (pieceColours, board) {
+		return A2(
+			_elm_lang$core$List$concatMap,
+			_user$project$Model$getBlockingBoardIdsForColour(board),
+			pieceColours);
+	});
+var _user$project$Update$winningMove = F3(
+	function (pieceColour, model, _p7) {
+		var _p8 = _p7;
+		var _p10 = A2(
+			_elm_lang$core$Maybe$andThen,
+			A4(_user$project$Model$placeAt, pieceColour, _p8._0, _p8._1, model),
+			function (_p9) {
+				return _user$project$Model$getWinner(
+					function (_) {
+						return _.board;
+					}(_p9));
+			});
+		if (_p10.ctor === 'Nothing') {
+			return false;
+		} else {
+			return true;
+		}
+	});
+var _user$project$Update$findMove = F2(
+	function (pieceColour, model) {
+		var moves = A2(
+			_user$project$Update$shuffle,
+			_mgold$elm_random_pcg$Random_Pcg$initialSeed(42),
+			A2(_user$project$Update$getAvailableMoves, pieceColour, model));
+		var maybeWinningMove = A2(
+			_user$project$Extras$find,
+			A2(_user$project$Update$winningMove, pieceColour, model),
+			moves);
+		var _p11 = maybeWinningMove;
+		if (_p11.ctor === 'Nothing') {
+			var _p14 = function () {
+				var blockingBoardIds = A2(
+					_user$project$Update$getBlockingBoardIds,
+					_user$project$Update$otherColours(pieceColour),
+					model.board);
+				return A2(
+					_user$project$Extras$find,
+					function (_p12) {
+						var _p13 = _p12;
+						return A2(_elm_lang$core$List$member, _p13._1, blockingBoardIds);
+					},
+					moves);
+			}();
+			if (_p14.ctor === 'Nothing') {
+				return _elm_lang$core$Basics$fst(
+					A2(
+						_mgold$elm_random_pcg$Random_Pcg$step,
+						_mgold$elm_random_pcg$Random_Pcg$sample(moves),
+						_mgold$elm_random_pcg$Random_Pcg$initialSeed(42)));
+			} else {
+				return _p14;
+			}
+		} else {
+			return _p11;
+		}
+	});
+var _user$project$Update$takeTurn = F2(
+	function (pieceColour, model) {
+		var maybeMove = A2(_user$project$Update$findMove, pieceColour, model);
+		var maybeWinner = _user$project$Model$getWinner(model.board);
+		var _p15 = {ctor: '_Tuple2', _0: maybeWinner, _1: maybeMove};
+		if ((((_p15.ctor === '_Tuple2') && (_p15._0.ctor === 'Nothing')) && (_p15._1.ctor === 'Just')) && (_p15._1._0.ctor === '_Tuple2')) {
+			return A2(
+				_elm_lang$core$Maybe$withDefault,
+				model,
+				A4(_user$project$Model$placeAt, pieceColour, _p15._1._0._0, _p15._1._0._1, model));
+		} else {
+			return model;
+		}
+	});
+var _user$project$Update$cpuMoves = function (model) {
+	var rackList = function () {
+		var _p16 = model.players;
+		switch (_p16) {
+			case 2:
+				return _elm_lang$core$Native_List.fromArray(
+					[_user$project$Model$Red]);
+			case 3:
+				return _elm_lang$core$Native_List.fromArray(
+					[_user$project$Model$Green, _user$project$Model$Red]);
+			default:
+				return _elm_lang$core$Native_List.fromArray(
+					[_user$project$Model$Green, _user$project$Model$Red, _user$project$Model$Yellow]);
+		}
+	}();
+	return A3(_elm_lang$core$List$foldl, _user$project$Update$takeTurn, model, rackList);
+};
 var _user$project$Update$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p17 = msg;
+		switch (_p17.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'NewGame':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_user$project$Model$defaultState,
+						{players: _p17._0, muted: model.muted}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'Place':
-				var _p2 = _p0._0;
-				if (A2(_user$project$Model$isFree, model.board, _p2)) {
-					var _p1 = model.selected;
-					if (_p1.ctor === 'Nothing') {
+				var _p20 = _p17._0;
+				if (A2(_user$project$Model$isFree, model.board, _p20)) {
+					var _p18 = model.selected;
+					if (_p18.ctor === 'Nothing') {
 						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 					} else {
-						var newModel = A4(_user$project$Model$placeAt, _user$project$Model$Blue, _p1._0, _p2, model);
-						return {
-							ctor: '_Tuple2',
-							_0: newModel,
-							_1: _user$project$Ports$sound('clack')
-						};
+						var _p19 = A4(_user$project$Model$placeAt, _user$project$Model$Blue, _p18._0, _p20, model);
+						if (_p19.ctor === 'Nothing') {
+							return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+						} else {
+							return {
+								ctor: '_Tuple2',
+								_0: _user$project$Update$cpuMoves(
+									_elm_lang$core$Native_Utils.update(
+										_p19._0,
+										{selected: _elm_lang$core$Maybe$Nothing})),
+								_1: model.muted ? _elm_lang$core$Platform_Cmd$none : _user$project$Ports$sound('clack')
+							};
+						}
 					}
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
 			case 'Mdl':
-				return A2(_debois$elm_mdl$Material$update, _p0._0, model);
+				return A2(_debois$elm_mdl$Material$update, _p17._0, model);
+			case 'Select':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							selected: _elm_lang$core$Maybe$Just(_p17._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							selected: _elm_lang$core$Maybe$Just(_p0._0)
+							muted: _elm_lang$core$Basics$not(model.muted)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
